@@ -17,3 +17,17 @@ loading, and feel free to use pytorch or tensorflow as you see fit.
 
 Implement a pedestrian detection method based of the labelled data. Since YOLOv5 and
 Faster R-CNN are included in the repo, try to use a different method.
+
+## Getting Started
+
+### Requirements
+
+1. Clone this repository
+2. Download the
+[Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset)
+3. Create a Python virtual environment and install the necessary packages
+
+```bash
+pyenv virtualenv 3.10.12 imos
+pip install -r requirements.txt
+```
