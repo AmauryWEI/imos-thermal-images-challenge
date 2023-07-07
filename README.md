@@ -8,7 +8,7 @@ challenges.
 ### Challenge 1
 
 Using this
-[Long-term datasets for detecting concept drift](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset)
+[Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset)
 to implement a deep-learning based method to predict the temperature in Celsius using
 the thermal images (and metadata if needed). Use the code provided in the repo for data
 loading, and feel free to use pytorch or tensorflow as you see fit.
