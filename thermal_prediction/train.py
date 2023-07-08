@@ -17,7 +17,7 @@ from thermal_dataset import ThermalDataset
 
 sys.path.append("./models/")
 from sample_model import SampleModel
-from model_trainer import ModelTrainer
+from model_trainer import ModelTrainer, parameters_count
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -95,8 +95,15 @@ def main(args: argparse.Namespace) -> int:
 
     # Load a model
     model = SampleModel().to(device)
-    print(model)
+    if not args.quiet:
+        total_params, trainable_params = parameters_count(model)
+        print(model)
+        print(
+            f"Parameters: {total_params} ; Trainable: {trainable_params} "
+            f"({trainable_params / total_params * 100} [%])"
+        )
 
+    # Train the model
     train(dataset, model, epochs_count=args.epochs, device=device)
 
     return 0
