@@ -27,7 +27,7 @@ class VideoClipLoader(torch.utils.data.Dataset):
         
         self.metadata = metadata
         #  make a list of all the videos available from the given metadata dataset
-        self.video_list = video_dir + "\\" + metadata["Folder name"].astype(str) + "\\" + metadata["Clip Name"].astype(str)  + pattern_vid
+        self.video_list = video_dir + os.sep + metadata["Folder name"].astype(str) + os.sep + metadata["Clip Name"].astype(str)  + pattern_vid
         
                     
 
@@ -58,7 +58,7 @@ class VideoClipLoader(torch.utils.data.Dataset):
     def get_video_metadata(self, video_path):
         
         #  get the video path and slipt it
-        video_path_split = video_path.split("\\")
+        video_path_split = video_path.split(os.sep)
         
         #  extract the folder name and clip name 
         video_folder = video_path_split[-2]
