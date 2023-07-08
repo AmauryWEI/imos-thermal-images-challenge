@@ -15,9 +15,11 @@ as a `.zip` archive on your machine.
 
 ## Renaming
 
-1. Rename the `LTD Dataset` folders to `LTD_Dataset` (with an underscore).
+1. Rename the `LTD Dataset` folders to `LTD_Dataset` (with an underscore)
 
-2. Rename the `Video Clips` folder to `Video_Clips` (with an underscore).
+2. Rename the `Video Clips` folder to `Data`
+
+3. Move the `metatada.csv` file inside the `/Data` folder
 
 After extraction and renaming, the folder structure should be:
 
@@ -27,9 +29,24 @@ After extraction and renaming, the folder structure should be:
     |   ├── Data_Subset_Autoencoders_Anomaly_Detectors/
     |   ├── LTD_Dataset/
     |   |   └── LTD_Dataset/
-    |   |       ├── Video_Clips/
+    |   |       ├── Data/
+    |   |       |   ├── 20200514/
+    |   |       |   ├── ...
+    |   |       |   └── metadata.csv
     |   |       ├── extract_images.py
-    |   |       ├── load_video_metadata.py
-    |   |       └── metadata.csv
+    |   |       └── load_video_metadata.py
     |   └── README.md
     └── README.md
+
+## Dataset Generation
+
+This section covers how to generate the required datasets to use in both challenges.
+
+### Thermal Images
+
+To generate the dataset of unique thermal images, run the following command:
+
+    ```zsh
+    pyenv shell imos    # Activate the virtual environment
+    python extract_images.py
+    ```
