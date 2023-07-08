@@ -99,6 +99,31 @@ def create_split_directories(target_dir: str, quiet: bool) -> tuple[str, str, st
     return directories_list
 
 
+def split_dataset(
+    metadata_abs_path: str,
+    training_dir: str,
+    validation_dir: str,
+    testing_dir: str,
+) -> None:
+    """
+    Split the raw dataset into different training / validation / testing subsets
+
+    Parameters
+    ----------
+    metadata_abs_path: str
+        Absolute path to the CSV file containing the images metadata
+    training_dir: str
+        Absolute path to the training set directory
+    validation_dir: str
+        Absolute path to the validation set directory
+    testing_dir: str
+        Absolute path to the testing set directory
+    """
+    # Load the contents of the metadata file
+    with open(metadata_abs_path, "r") as data_file:
+        metadata_reader = csv.reader(data_file)
+
+
 def main(args: argparse.Namespace) -> int:
     # Set the seeds
     seed(args.seed)
@@ -133,9 +158,8 @@ def main(args: argparse.Namespace) -> int:
         quiet=args.quiet,
     )
 
-    # Load the contents of the metadata file
-    with open(metadata_abs_path, "r") as data_file:
-        metadata_reader = csv.reader(data_file)
+    # Split the dataset into multiple directories
+    split_dataset(metadata_abs_path, training_dir, validation_dir, testing_dir)
 
     return 0
 
