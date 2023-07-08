@@ -52,6 +52,7 @@ TRAINING_RATIO = 0.6
 VALIATION_RATIO = 0.2
 TESTING_RATIO = 0.2
 
+
 def clean_create_directory(absolute_directory_path: str, quiet: bool) -> None:
     """Create a directory (and clean it if already existing)
 
@@ -70,7 +71,7 @@ def clean_create_directory(absolute_directory_path: str, quiet: bool) -> None:
     makedirs(absolute_directory_path)
 
 
-def create_split_directories(target_dir: str) -> None:
+def create_split_directories(target_dir: str, quiet: bool) -> tuple[str, str, str]:
     """
     Create the training, validation, and testing directories
 
@@ -78,10 +79,24 @@ def create_split_directories(target_dir: str) -> None:
     ----------
     target_dir: str
         Absolute path to the target directory
+
+    Returns
+    -------
+    str
+        Training directory absolute path
+    str
+        Validation directory absolute path
+    str
+        Testing directory absolute path
     """
     DIRECTORIES_NAMES = ["training", "validation", "testing"]
+
+    directories_list = []
     for directory_name in DIRECTORIES_NAMES:
-        clean_create_directory(path.join(target_dir, directory_name))
+        directories_list.append(path.join(target_dir, directory_name))
+        clean_create_directory(directories_list[-1], quiet=quiet)
+
+    return directories_list
 
 
 def main(args: argparse.Namespace) -> int:
@@ -101,7 +116,7 @@ def main(args: argparse.Namespace) -> int:
     if not path.isfile(metadata_abs_path):
         print("ERROR: ", metadata_abs_path, " is a directory.")
         return 1
-    
+
     # Obtain the root directory (which should contain all the subfolders with images)
     dataset_root_dir = path.dirname(metadata_abs_path)
 
@@ -111,15 +126,19 @@ def main(args: argparse.Namespace) -> int:
         print("ERROR: Output directory is the raw dataset directory.")
         return 1
     clean_create_directory(output_dir_abs_path, quiet=args.quiet)
-    
+
     # Create the split dataset folder structure
-    create_split_directories()
+    training_dir, validation_dir, testing_dir = create_split_directories(
+        output_dir_abs_path,
+        quiet=args.quiet,
+    )
 
     # Load the contents of the metadata file
     with open(metadata_abs_path, "r") as data_file:
         metadata_reader = csv.reader(data_file)
 
     return 0
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
