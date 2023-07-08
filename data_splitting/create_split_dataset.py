@@ -9,6 +9,8 @@ import csv
 from os import path, makedirs
 from shutil import rmtree
 from sys import exit
+from random import seed
+import numpy as np
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -69,6 +71,10 @@ def clean_create_directory(absolute_directory_path: str, quiet: bool) -> None:
 
 
 def main(args: argparse.Namespace) -> int:
+    # Set the seeds
+    seed(args.seed)
+    np.random.seed(args.seed)
+
     # Convert potentially relative path to absolute path
     metadata_abs_path = path.abspath(args.metadata_file)
     if not args.quiet:
