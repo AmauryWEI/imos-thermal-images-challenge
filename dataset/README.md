@@ -31,6 +31,8 @@ After extraction and renaming, the folder structure should be:
     |   |   └── LTD_Dataset/
     |   |       ├── Data/
     |   |       |   ├── 20200514/
+    |   |       |   |   ├── clip_0_1331.mp4
+    |   |       |   |   └── ...
     |   |       |   ├── ...
     |   |       |   └── metadata.csv
     |   |       ├── extract_images.py
