@@ -177,7 +177,7 @@ class ModelTrainer:
             self.__optimizer.step()
 
             # Store performance metrics and update loss on status bar
-            tqdm_iterator.set_postfix_str(f"Loss: {loss_value:.3e}", refresh=False)
+            tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}", refresh=False)
 
         mean_loss = training_loss / training_losses_count
         print(f"Epoch {self.__epoch}: Mean training loss {mean_loss:.2f}")
