@@ -69,14 +69,13 @@ class SampleModel(Module):
         cnn_out = self.cnn_pool5(cnn_out)
 
         cnn_out = cnn_out.view(cnn_out.size(0), -1)
-        print(cnn_out.shape)
         cnn_out = self.cnn_fc(cnn_out)
 
         # MLP Forward
         mlp_out = relu(self.mlp_fc(metadata))
 
         # Network Out with CNN Out and MLP Out
-        out = cat((cnn_out, mlp_out))
+        out = cat((cnn_out, mlp_out), 1)
         out = relu(self.out_fc(out))
 
         return out
