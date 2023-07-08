@@ -69,10 +69,10 @@ def train(
 
 def main(args: argparse.Namespace) -> int:
     device = torch.device("cpu")
-    # if torch.backends.mps.is_available():
-    #     device = torch.device("mps")
-    # elif torch.cuda.is_available():
-    #     device = torch.device("cuda")
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
 
     # Convert potentially relative path to absolute path
     metadata_abs_path = path.abspath(args.metadata_file)
