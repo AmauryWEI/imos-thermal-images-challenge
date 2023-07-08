@@ -1,0 +1,6 @@
+numpy
+pandas
+decord
+torch
+torchvision
+torchaudio
