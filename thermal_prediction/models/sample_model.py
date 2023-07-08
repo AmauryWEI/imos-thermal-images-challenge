@@ -11,7 +11,7 @@ class SampleModel(Module):
     Basic Convolutional Neural Network with 3x3 kernels and batch normalization for
     temperature prediction on the Long-term Thermal Drift Dataset.
 
-    Input:  Image (Tensor 384 x 288) + Metadata (Tensor 7 x 1)
+    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 7 x 1)
     Output: Temperature (float)
     """
 
@@ -22,33 +22,57 @@ class SampleModel(Module):
         self.__mlp_output_size = 7
         self.__out_fc_input_size = self.__cnn_fc_output_size + self.__mlp_output_size
 
+        ################
         # CNN Components
+        # Conv2d Out = 1 + (In + 2 * padding - dilation x (kernel_size - 1) - 1) / stride
+        # MaxPool2d Out = 1 + (In + 2 * padding - dilation * (kernel_size - 1) - 1) / stride
+        ################
+        # Size = 288 x 384
         self.cnn_conv1 = Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
+        # Size = 32 x 288 x 384
         self.cnn_bn1 = BatchNorm2d(32)
+        # Size = 32 x 288 x 384
         self.cnn_pool1 = MaxPool2d(kernel_size=2, stride=2)
+        # Size = 32 x 144 x 192
 
         self.cnn_conv2 = Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        # Size = 64 x 144 x 192
         self.cnn_bn2 = BatchNorm2d(64)
+        # Size = 64 x 144 x 192
         self.cnn_pool2 = MaxPool2d(kernel_size=2, stride=2)
+        # Size = 64 x 72 x 96
 
         self.cnn_conv3 = Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        # Size = 128 x 72 x 96
         self.cnn_bn3 = BatchNorm2d(128)
+        # Size = 128 x 72 x 96
         self.cnn_pool3 = MaxPool2d(kernel_size=2, stride=2)
+        # Size = 128 x 36 x 48
 
         self.cnn_conv4 = Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        # Size = 256 x 36 x 48
         self.cnn_bn4 = BatchNorm2d(256)
+        # Size = 256 x 36 x 48
         self.cnn_pool4 = MaxPool2d(kernel_size=2, stride=2)
+        # Size = 256 x 18 x 24
 
-        self.cnn_conv5 = Conv2d(256, 512, kernel_size=3, stride=1, padding=1)
-        self.cnn_bn5 = BatchNorm2d(512)
+        self.cnn_conv5 = Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
+        # Size = 256 x 18 x 24
+        self.cnn_bn5 = BatchNorm2d(256)
+        # Size = 256 x 18 x 24
         self.cnn_pool5 = MaxPool2d(kernel_size=2, stride=2)
+        # Size = 256 x 9 x 12
 
-        self.cnn_fc = Linear(512 * 12 * 9, self.__cnn_fc_output_size)
+        self.cnn_fc = Linear(256 * 9 * 12, self.__cnn_fc_output_size)
 
+        ################
         # MLP Components
+        ################
         self.mlp_fc = Linear(7, self.__mlp_output_size)
 
+        ################
         # Single output = temperature
+        ################
         self.out_fc = Linear(self.__out_fc_input_size, 1)
 
     def forward(self, image: Tensor, metadata: Tensor):
