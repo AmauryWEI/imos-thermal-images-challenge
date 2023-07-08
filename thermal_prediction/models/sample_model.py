@@ -61,7 +61,12 @@ class SampleModel(Module):
 
         cnn_out = self.cnn_bn3(relu(self.cnn_conv3(cnn_out)))
         cnn_out = self.cnn_pool3(cnn_out)
-        print(cnn_out.shape)
+
+        cnn_out = self.cnn_bn4(relu(self.cnn_conv4(cnn_out)))
+        cnn_out = self.cnn_pool4(cnn_out)
+
+        cnn_out = self.cnn_bn5(relu(self.cnn_conv5(cnn_out)))
+        cnn_out = self.cnn_pool5(cnn_out)
 
         cnn_out = cnn_out.view(cnn_out.size(0), -1)
         print(cnn_out.shape)
