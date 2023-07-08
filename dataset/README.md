@@ -52,3 +52,34 @@ To generate the dataset of unique thermal images, run the following command:
     pyenv shell imos    # Activate the virtual environment
     python extract_images.py
     ```
+
+Disclaimer: this command will take a while (10s of minutes). At the end of the dataset
+generation, you should obtain the following folder structure:
+
+    .
+    ├── dataset/
+    |   ├── Data_Annotated_Subset_Object_Detectors/
+    |   ├── Data_Subset_Autoencoders_Anomaly_Detectors/
+    |   ├── LTD_Dataset/
+    |   |   └── LTD_Dataset/
+    |   |       ├── Data/
+    |   |       |   ├── 20200514/
+    |   |       |   |   ├── clip_0_1331.mp4
+    |   |       |   |   └── ...
+    |   |       |   ├── ...
+    |   |       |   └── metadata.csv
+    |   |       ├── Image_Dataset/
+    |   |       |   ├── 20200514/
+    |   |       |   |   ├── clip_0_1331/
+    |   |       |   |   |   ├── image_0000.jpg
+    |   |       |   |   |   ├── ...
+    |   |       |   |   |   └── image_XXXX.jpg
+    |   |       |   |   |── .../
+    |   |       |   |   └── clip_n_HHmm/
+    |   |       |   ├── ...
+    |   |       |   ├── YYYMMDD/
+    |   |       |   └── metadata_images.csv
+    |   |       ├── extract_images.py
+    |   |       └── load_video_metadata.py
+    |   └── README.md
+    └── README.md
