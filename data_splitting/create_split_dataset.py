@@ -98,6 +98,9 @@ def main(args: argparse.Namespace) -> int:
     if not path.exists(metadata_abs_path):
         print("ERROR: File ", metadata_abs_path, " does not exist.")
         return 1
+    if not path.isfile(metadata_abs_path):
+        print("ERROR: ", metadata_abs_path, " is a directory.")
+        return 1
     
     # Obtain the root directory (which should contain all the subfolders with images)
     dataset_root_dir = path.dirname(metadata_abs_path)
