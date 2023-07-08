@@ -209,3 +209,23 @@ class ModelTrainer:
         # Obtain and save mean performance for this round
         mean_loss = validation_loss / validation_losses_count
         print(f"Epoch {self.__epoch}: Mean validation loss {mean_loss:.2f}")
+
+
+def parameters_count(model: Module) -> tuple[int, int]:
+    """
+    Compute the numbers of parameters in a model
+
+    Parameters
+    ----------
+    model : Module
+        Neural network model
+
+    Returns
+    -------
+    tuple[int, int]
+        Total count of parameters, Trainable parameters count
+    """
+    return [
+        sum(p.numel() for p in model.parameters()),
+        sum(p.numel() for p in model.parameters() if p.requires_grad),
+    ]
