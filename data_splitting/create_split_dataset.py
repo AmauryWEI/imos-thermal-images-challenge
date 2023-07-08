@@ -70,6 +70,20 @@ def clean_create_directory(absolute_directory_path: str, quiet: bool) -> None:
     makedirs(absolute_directory_path)
 
 
+def create_split_directories(target_dir: str) -> None:
+    """
+    Create the training, validation, and testing directories
+
+    Parameters
+    ----------
+    target_dir: str
+        Absolute path to the target directory
+    """
+    DIRECTORIES_NAMES = ["training", "validation", "testing"]
+    for directory_name in DIRECTORIES_NAMES:
+        clean_create_directory(path.join(target_dir, directory_name))
+
+
 def main(args: argparse.Namespace) -> int:
     # Set the seeds
     seed(args.seed)
@@ -94,6 +108,9 @@ def main(args: argparse.Namespace) -> int:
         print("ERROR: Output directory is the raw dataset directory.")
         return 1
     clean_create_directory(output_dir_abs_path, quiet=args.quiet)
+    
+    # Create the split dataset folder structure
+    create_split_directories()
 
     # Load the contents of the metadata file
     with open(metadata_abs_path, "r") as data_file:
