@@ -110,6 +110,7 @@ def split_dataset(
     validation_dir: str,
     testing_dir: str,
     seed: int = 0,
+    quiet: bool = False
 ) -> int:
     """
     Split the raw dataset into different training / validation / testing subsets
@@ -160,11 +161,17 @@ def split_dataset(
     images_count = len(shuffled_metadata.index)
     training_images_count = int(TRAINING_RATIO * images_count)
     validation_images_count = int(VALIATION_RATIO * images_count)
+    testing_images_count = images_count - training_images_count - validation_images_count
 
     # Split the dataset into training, validation, and testing
     training, validation, testing = np.split(
         shuffled_metadata, [training_images_count, validation_images_count]
     )
+
+    if not quiet:
+        print(f"Training Set\t: {training_images_count} / {images_count} ({100*training_images_count/images_count:.2f} [%])")
+        print(f"Validation Set\t: {validation_images_count} / {images_count} ({100*validation_images_count/images_count:.2f} [%])")
+        print(f"Testing Set\t: {testing_images_count} / {images_count} ({100*testing_images_count/images_count:.2f} [%])")
 
     # Save the metadata to CSV
     training.to_csv(path.join(training_dir, "metadata_images.csv"), index=False)
@@ -213,6 +220,7 @@ def main(args: argparse.Namespace) -> int:
         validation_dir,
         testing_dir,
         seed=args.seed,
+        quiet=args.quiet
     )
 
     return 0
