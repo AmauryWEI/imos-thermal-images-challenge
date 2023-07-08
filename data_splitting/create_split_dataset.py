@@ -163,9 +163,9 @@ def split_dataset(
     )
 
     # Save the metadata to CSV
-    training.to_csv(path.join(training_dir, "metadata_images.csv"))
-    validation.to_csv(path.join(validation_dir, "metadata_images.csv"))
-    testing.to_csv(path.join(testing_dir, "metadata_images.csv"))
+    training.to_csv(path.join(training_dir, "metadata_images.csv"), index=False)
+    validation.to_csv(path.join(validation_dir, "metadata_images.csv"), index=False)
+    testing.to_csv(path.join(testing_dir, "metadata_images.csv"), index=False)
 
 
 def main(args: argparse.Namespace) -> int:
