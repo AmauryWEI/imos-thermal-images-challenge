@@ -54,13 +54,15 @@ VALIATION_RATIO = 0.2
 TESTING_RATIO = 1 - TRAINING_RATIO - VALIATION_RATIO
 
 
-def clean_create_directory(absolute_directory_path: str, quiet: bool) -> None:
+def clean_create_directory(absolute_directory_path: str, quiet: bool = False) -> None:
     """Create a directory (and clean it if already existing)
 
     Parameters
     ----------
     absolute_directory_path: str
         Absolute path to the directory to create
+    quiet: bool
+        True to disable log output
     """
     if path.exists(absolute_directory_path):
         if not quiet:
@@ -72,7 +74,7 @@ def clean_create_directory(absolute_directory_path: str, quiet: bool) -> None:
     makedirs(absolute_directory_path)
 
 
-def create_split_directories(target_dir: str, quiet: bool) -> tuple[str, str, str]:
+def create_split_directories(target_dir: str, quiet: bool = False) -> tuple[str, str, str]:
     """
     Create the training, validation, and testing directories
 
@@ -80,6 +82,8 @@ def create_split_directories(target_dir: str, quiet: bool) -> tuple[str, str, st
     ----------
     target_dir: str
         Absolute path to the target directory
+    quiet: bool
+        True to disable log output
 
     Returns
     -------
