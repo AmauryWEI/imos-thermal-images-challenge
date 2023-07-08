@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
 
 
-    main_save_dir = r"Image Dataset"
+    main_save_dir = r"Image_Dataset"
 
     # Training
     #  creating the cfg file containing all the necessary information for creating the training set
