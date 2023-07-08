@@ -58,7 +58,7 @@ def train(
         model=model,
         dataset=dataset,
         epochs_count=epochs_count,
-        batch_size=10,
+        batch_size=100,
         learning_rate=1e-3,
         workers_count=1,
         k_folds=5,
