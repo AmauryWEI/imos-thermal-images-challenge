@@ -5,12 +5,13 @@
 # Description:  Script to create a training/validation/testing split using the LTD dataset
 
 import argparse
-import csv
 from os import path, makedirs
 from shutil import rmtree
 from sys import exit
 from random import seed
+
 import numpy as np
+import pandas as pd
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -50,7 +51,7 @@ parser.add_argument(
 
 TRAINING_RATIO = 0.6
 VALIATION_RATIO = 0.2
-TESTING_RATIO = 0.2
+TESTING_RATIO = 1 - TRAINING_RATIO - VALIATION_RATIO
 
 
 def clean_create_directory(absolute_directory_path: str, quiet: bool) -> None:
@@ -104,7 +105,8 @@ def split_dataset(
     training_dir: str,
     validation_dir: str,
     testing_dir: str,
-) -> None:
+    seed: int = 0,
+) -> int:
     """
     Split the raw dataset into different training / validation / testing subsets
 
@@ -118,10 +120,52 @@ def split_dataset(
         Absolute path to the validation set directory
     testing_dir: str
         Absolute path to the testing set directory
+    seed: int
+        Random number generator seed
+
+    Returns
+    -------
+    int
+        0 on success ; 1 on failure
     """
+    RAW_METADATA_COLUMNS = [
+        "Folder name",
+        "Clip Name",
+        "Image Number",
+        "DateTime",
+        "Temperature",
+        "Humidity",
+        "Precipitation",
+        "Dew Point",
+        "Wind Direction",
+        "Wind Speed",
+        "Sun Radiation Intensity",
+        "Min of sunshine latest 10 min",
+    ]
+
     # Load the contents of the metadata file
-    with open(metadata_abs_path, "r") as data_file:
-        metadata_reader = csv.reader(data_file)
+    metadata = pd.read_csv(metadata_abs_path, header=0)
+    if list(metadata.columns.values) != RAW_METADATA_COLUMNS:
+        print("ERROR: Unexpected columns headers ", list(metadata.columns.values))
+        return 1
+
+    # Shuffle all of the metadata to randomize the split
+    shuffled_metadata = metadata.sample(frac=1, random_state=seed)
+
+    # Define the images split
+    images_count = len(shuffled_metadata.index)
+    training_images_count = int(TRAINING_RATIO * images_count)
+    validation_images_count = int(VALIATION_RATIO * images_count)
+
+    # Split the dataset into training, validation, and testing
+    training, validation, testing = np.split(
+        shuffled_metadata, [training_images_count, validation_images_count]
+    )
+
+    # Save the metadata to CSV
+    training.to_csv(path.join(training_dir, "metadata_images.csv"))
+    validation.to_csv(path.join(validation, "metadata_images.csv"))
+    testing.to_csv(path.join(testing, "metadata_images.csv"))
 
 
 def main(args: argparse.Namespace) -> int:
@@ -159,7 +203,13 @@ def main(args: argparse.Namespace) -> int:
     )
 
     # Split the dataset into multiple directories
-    split_dataset(metadata_abs_path, training_dir, validation_dir, testing_dir)
+    split_dataset(
+        metadata_abs_path,
+        training_dir,
+        validation_dir,
+        testing_dir,
+        seed=args.seed,
+    )
 
     return 0
 
