@@ -25,12 +25,22 @@ Faster R-CNN are included in the repo, try to use a different method.
 1. Clone this repository
 2. Download the
 [Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset)
+by following the instructions under [`/dataset/README.md`](./dataset/README.md)
 3. Create a Python virtual environment and install the necessary packages
 
 ```bash
 pyenv virtualenv 3.10.12 imos
 pip install -r requirements.txt
 ```
+
+### Quick Start Guide
+
+1. Split the raw `Image_Dataset` into three separate training, validation, and testing
+sets:
+
+    ```bash
+    python data_splitting/create_split_dataset.py ./dataset/LTD_Dataset/LTD_Dataset/Image_Dataset/metada_images.csv -o ./dataset/LTD_Dataset/LTD_Dataset/Split_Dataset/
+    ```
 
 ## Q&A
 
