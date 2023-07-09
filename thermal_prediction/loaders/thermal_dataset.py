@@ -3,6 +3,7 @@
 # Description:  Definition of the ThermalDataset class to use for Challenge #1
 
 from os import path
+from datetime import datetime
 
 import pandas as pd
 from torch import Tensor
@@ -46,6 +47,9 @@ class ThermalDataset(Dataset):
             raise RuntimeError(
                 "Unexpected columns headers: ", list(self.__metadata.columns.values)
             )
+
+        # Convert the string date to day of the year + hour
+        self.__create_day_and_hour_columns()
 
         # Augment the dataset if required
         if augmentation:
@@ -105,3 +109,18 @@ class ThermalDataset(Dataset):
 
     def __metadata_as_tensor(self, index: int) -> Tensor:
         return Tensor(self.__metadata.iloc[index, 5:12])
+
+    def __create_day_and_hour_columns(self) -> None:
+        # Create empty columns in the DataFrame
+        self.__metadata["Day"] = ""
+        self.__metadata["Hour"] = ""
+
+        for _, row in self.__metadata.iterrows():
+            # Convert the "DateTime" string to an actual Python object
+            datetime_object = datetime.strptime(row["DateTime"], "%d/%m/%y %H:%M")
+            # Find out the first day of the year the image was taken in
+            year_start = datetime_object.replace(month=1).replace(day=1)
+            # Assign the "Day" column to a number of days (will be in [0 - 365])
+            row["Day"] = (datetime_object - year_start).days
+            # Assign the "Hour" column to a number of minutes (will be in [0 - (24*60 - 1)])
+            row["Hour"] = datetime_object.hour * 60 + datetime_object.minute
