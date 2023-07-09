@@ -31,6 +31,7 @@ class ThermalDataset(Dataset):
     def __init__(
         self,
         metadata_abs_path: str,
+        images_abs_path: str,
         normalize: bool = True,
         augment: bool = False,
         quiet: bool = False,
@@ -42,6 +43,8 @@ class ThermalDataset(Dataset):
         ----------
         metadata_abs_path : str
             Absolute path to the metadata_images.csv file
+        images_abs_path : str
+            Absolute path to the root folder containing the images subfolders
         normalize: bool, optional
             Normalize the images and metadata, by default True
         augment: bool, optional
@@ -49,7 +52,7 @@ class ThermalDataset(Dataset):
         quiet: bool, optional
             No log output, by default False
         """
-        self.__dataset_root_dir = path.dirname(metadata_abs_path)
+        self.__images_abs_path = images_abs_path
         self.__normalize = normalize
         self.__quiet = quiet
 
@@ -113,7 +116,7 @@ class ThermalDataset(Dataset):
         """
         data_frame_row = self.__metadata.loc[index]
         image_abs_path = path.join(
-            self.__dataset_root_dir,
+            self.__images_abs_path,
             data_frame_row["Folder name"].astype(str),
             data_frame_row["Clip Name"],
             data_frame_row["Image Number"] + ".jpg",
