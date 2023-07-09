@@ -6,6 +6,7 @@ from tqdm import tqdm
 import torch
 from torch.optim import Adam
 from torch.nn import Module, MSELoss
+from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader, Subset, ConcatDataset, random_split
 
 
@@ -27,10 +28,15 @@ class ModelTrainer:
         learning_rate: int,
         workers_count: int,
         k_folds: int,
+        normalize_images: bool = True,
         device: torch.device = torch.device("cpu"),
     ) -> None:
         self.__model = model.to(device)
         self.__device = device
+
+        self.__normalize_images = normalize_images
+        self.__training_image_mean = 0
+        self.__training_image_std = 1
 
         self.__epochs_count = epochs_count
         self.__batch_size = batch_size
@@ -138,8 +144,19 @@ class ModelTrainer:
                     num_workers=self.__workers_count,
                     shuffle=True,
                 )
+                # Compute the mean and stdandard deviation of the training set
+                if self.__normalize_images:
+                    self.__compute_image_normalization_parameters()
+
                 self.__train()
                 self.__validate()
+
+    def __compute_image_normalization_parameters(self):
+        images, _, _ = next(iter(self.__train_data_loader))
+        # shape of images = [b,c,w,h]
+        self.__training_image_mean, self.__training_image_std = images.mean(
+            [0, 2, 3]
+        ), images.std([0, 2, 3])
 
     def __train(self):
         """
@@ -147,6 +164,9 @@ class ModelTrainer:
         """
         training_loss = 0.0
         training_losses_count = 0
+        transform = transforms.Normalize(
+            self.__training_image_mean, self.__training_image_std
+        )
 
         # Turn on training mode to enable gradient computation
         self.__model.train()
@@ -158,6 +178,10 @@ class ModelTrainer:
             image = image.to(self.__device, dtype=torch.float)
             metadata = metadata.to(self.__device, dtype=torch.float)
             temperature = temperature.to(self.__device)
+
+            # Normalize the image if necessary
+            if self.__normalize_images:
+                image = transform(image)
 
             # Set gradient to zero to prevent gradient accumulation
             self.__optimizer.zero_grad()
