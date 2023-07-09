@@ -2,6 +2,8 @@
 # Date:         2023/07/08
 # Description:  ModelTrainer class to train neural networks for Challenge #1
 
+from os import path, makedirs
+
 from tqdm import tqdm
 import torch
 from torch.optim import Adam
@@ -30,6 +32,7 @@ class ModelTrainer:
         k_folds: int,
         normalize_images: bool = True,
         device: torch.device = torch.device("cpu"),
+        checkpoints_dir: str = "checkpoints",
     ) -> None:
         self.__model = model.to(device)
         self.__device = device
@@ -49,6 +52,10 @@ class ModelTrainer:
         self.__epoch = 0
         self.__train_data_loader = None
         self.__validation_data_loader = None
+
+        self.__checkpoints_dir = path.abspath(checkpoints_dir)
+        if not path.exists(self.__checkpoints_dir):
+            makedirs(self.__checkpoints_dir)
 
         # Split into training and validation dataset
         self.__k_folds_datasets = []
@@ -126,7 +133,7 @@ class ModelTrainer:
         for self.__fold, (train_data, validation_data) in enumerate(
             self.__k_folds_datasets
         ):
-            print(f"Fold {self.__fold+1}:")
+            print(f"Fold {self.__fold}:")
 
             # Prepare validation data
             self.__validation_data_loader = DataLoader(
@@ -154,8 +161,9 @@ class ModelTrainer:
                     shuffle=True,
                 )
 
-                self.__train()
+                epoch_mean_loss = self.__train()
                 self.__validate()
+                self.__save_checkpoint(epoch_mean_loss)
 
     def __compute_image_normalization_parameters(self):
         images, _, _ = next(iter(self.__train_data_loader))
@@ -164,9 +172,14 @@ class ModelTrainer:
             [0, 2, 3]
         ), images.std([0, 2, 3])
 
-    def __train(self):
+    def __train(self) -> float:
         """
         Train model weights and track performance
+
+        Returns
+        -------
+        float
+            Mean training loss of the epoch
         """
         training_loss = 0.0
         training_losses_count = 0
@@ -212,6 +225,8 @@ class ModelTrainer:
         mean_loss = training_loss / training_losses_count
         print(f"Epoch {self.__epoch}: Mean training loss {mean_loss:.2f}")
 
+        return mean_loss
+
     def __validate(self):
         validation_loss = 0.0
         validation_losses_count = 0
@@ -239,6 +254,20 @@ class ModelTrainer:
         # Obtain and save mean performance for this round
         mean_loss = validation_loss / validation_losses_count
         print(f"Epoch {self.__epoch}: Mean validation loss {mean_loss:.2f}")
+
+    def __save_checkpoint(self, epoch_mean_loss: float) -> None:
+        path = path.join(
+            self.__checkpoints_dir, f"fold-{self.__fold}_epoch-{self.epoch}.pt"
+        )
+        torch.save(
+            {
+                "epoch": self.__epoch,
+                "model_state_dict": self.__model.state_dict(),
+                "optimizer_state_dict": self.__optimizer.state_dict(),
+                "loss": epoch_mean_loss,
+            },
+            path,
+        )
 
 
 def parameters_count(model: Module) -> tuple[int, int]:
