@@ -52,15 +52,18 @@ class ThermalDataset(Dataset):
         quiet: bool, optional
             No log output, by default False
         """
+        self.__metadata_abs_path = metadata_abs_path
         self.__images_abs_path = images_abs_path
         self.__normalize = normalize
         self.__quiet = quiet
 
         # Load the metadata CSV file
-        self.__metadata = pd.read_csv(metadata_abs_path)
-        if list(self.__metadata.columns.values) != RAW_METADATA_COLUMNS:
+        self.__metadata = pd.read_csv(self.__metadata_abs_path)
+        if not all(
+            item in self.__metadata.columns.values for item in RAW_METADATA_COLUMNS
+        ):
             raise RuntimeError(
-                "Unexpected columns headers: ", list(self.__metadata.columns.values)
+                f"Unexpected columns headers: {list(self.__metadata.columns.values)}"
             )
         if not self.__quiet:
             print("ThermalDataset: metadata loaded")
@@ -148,22 +151,30 @@ class ThermalDataset(Dataset):
         return Tensor(self.__metadata.iloc[index, 5:14])
 
     def __create_day_and_hour_columns(self) -> None:
-        # Create empty columns in the DataFrame
-        self.__metadata["Day"] = 0
-        self.__metadata["Hour"] = 0
+        if "Day" not in self.__metadata or "Hour" not in self.__metadata:
+            # Create empty columns in the DataFrame
+            self.__metadata["Day"] = 0
+            self.__metadata["Hour"] = 0
 
-        for _, row in self.__metadata.iterrows():
-            # Convert the "DateTime" string to an actual Python object
-            datetime_object = datetime.strptime(row["DateTime"], "%Y-%m-%d %H:%M:%S")
-            # Find out the first day of the year the image was taken in
-            year_start = datetime_object.replace(month=1).replace(day=1)
-            # Assign the "Day" column to a number of days (will be in [0 - 365])
-            row["Day"] = (datetime_object - year_start).days
-            # Assign the "Hour" column to a number of minutes (will be in [0 - (24*60 - 1)])
-            row["Hour"] = datetime_object.hour * 60 + datetime_object.minute
+            for idx in self.__metadata.index:
+                # Convert the "DateTime" string to an actual Python object
+                datetime_object = datetime.strptime(
+                    self.__metadata.at[idx, "DateTime"], "%Y-%m-%d %H:%M:%S"
+                )
+                # Find out the first day of the year the image was taken in
+                year_start = datetime_object.replace(month=1).replace(day=1)
+                # Assign the "Day" column to a number of days (will be in [0 - 365])
+                self.__metadata.at[idx, "Day"] = (datetime_object - year_start).days
+                # Assign the "Hour" column to a number of minutes (will be in [0 - (24*60 - 1)])
+                self.__metadata.at[idx, "Hour"] = (
+                    datetime_object.hour * 60 + datetime_object.minute
+                )
 
-        if not self.__quiet:
-            print("ThermalDataset: 'Day' and 'Hour' columns created")
+            # Update the CSV file on the disk (to speed-up for next time)
+            self.__metadata.to_csv(self.__metadata_abs_path, index=False)
+
+            if not self.__quiet:
+                print("ThermalDataset: 'Day' and 'Hour' columns created")
 
     def __normalize_metadata(self) -> None:
         # Normalize the "Humidity" column (between 0 and 100 [%])
