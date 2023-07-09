@@ -54,6 +54,14 @@ parser.add_argument(
     default=10,
 )
 
+parser.add_argument(
+    "-c",
+    "--checkpoint",
+    help="Initial model checkpoint to load before training",
+    type=str,
+    default="",
+)
+
 
 def train(
     dataset: Dataset,
@@ -61,6 +69,7 @@ def train(
     epochs_count: int,
     normalize_images: bool,
     device: torch.device,
+    checkpoint: str,
     model_name: str,
 ) -> None:
     model_trainer = ModelTrainer(
@@ -73,6 +82,7 @@ def train(
         k_folds=5,
         normalize_images=normalize_images,
         device=device,
+        load_checkpoint_file=checkpoint,
         model_name=model_name,
     )
     model_trainer.run()
@@ -134,6 +144,7 @@ def main(args: argparse.Namespace) -> int:
         epochs_count=args.epochs,
         normalize_images=True,
         device=device,
+        checkpoint=args.checkpoint,
         model_name="sample-model",
     )
 
