@@ -28,7 +28,12 @@ RAW_METADATA_COLUMNS = [
 
 
 class ThermalDataset(Dataset):
-    def __init__(self, metadata_abs_path: str, augmentation: bool = False) -> None:
+    def __init__(
+        self,
+        metadata_abs_path: str,
+        normalize: bool = True,
+        augment: bool = False,
+    ) -> None:
         """
         Initialize the ThermalDataset class
 
@@ -40,6 +45,7 @@ class ThermalDataset(Dataset):
             Augment the dataset, by default False
         """
         self.__dataset_root_dir = path.dirname(metadata_abs_path)
+        self.__normalize = normalize
 
         # Load the metadata CSV file
         self.__metadata = pd.read_csv(metadata_abs_path)
@@ -52,12 +58,14 @@ class ThermalDataset(Dataset):
         self.__create_day_and_hour_columns()
 
         # Augment the dataset if required
-        if augmentation:
+        if augment:
             # TODO: Implement Dataset augmentation
             pass
 
         # Compute normalization parameters
-        # TODO: Compute image normalization parameters and metadata normalization
+        if self.__normalize:
+            self.__normalize_metadata()
+            self.__compute_image_normalization_params()
 
     def __len__(self) -> int:
         return len(self.__metadata.index)
@@ -124,3 +132,9 @@ class ThermalDataset(Dataset):
             row["Day"] = (datetime_object - year_start).days
             # Assign the "Hour" column to a number of minutes (will be in [0 - (24*60 - 1)])
             row["Hour"] = datetime_object.hour * 60 + datetime_object.minute
+
+    def __normalize_metadata(self) -> None:
+        pass
+
+    def __compute_image_normalization_params(self) -> None:
+        pass
