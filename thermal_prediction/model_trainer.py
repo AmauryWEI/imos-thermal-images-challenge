@@ -268,6 +268,8 @@ class ModelTrainer:
                 "model_state_dict": self.__model.state_dict(),
                 "optimizer_state_dict": self.__optimizer.state_dict(),
                 "loss": epoch_mean_loss,
+                "training_image_mean": self.__training_image_mean,
+                "training_image_std": self.__training_image_std,
             },
             path,
         )
