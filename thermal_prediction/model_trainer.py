@@ -3,6 +3,7 @@
 # Description:  ModelTrainer class to train neural networks for Challenge #1
 
 from os import path, makedirs
+from copy import deepcopy
 
 import numpy as np
 from tqdm import tqdm
@@ -177,9 +178,11 @@ class ModelTrainer:
                 )
 
                 training_losses = self.__train()
-                epochs_losses.append(training_losses)
+                epochs_losses.append(deepcopy(training_losses))
                 validation_losses = self.__validate()
                 self.__save_checkpoint(training_losses, validation_losses)
+
+            k_folds_losses.append(deepcopy(epochs_losses))
 
     def __compute_image_normalization_parameters(self):
         images, _, _ = next(iter(self.__train_data_loader))
