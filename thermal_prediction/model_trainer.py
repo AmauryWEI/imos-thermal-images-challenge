@@ -135,6 +135,15 @@ class ModelTrainer:
                 num_workers=self.__workers_count,
             )
 
+            # Compute the mean and standard deviation of the training set
+            self.__train_data_loader = DataLoader(
+                train_data,
+                batch_size=self.__batch_size,
+                num_workers=self.__workers_count,
+            )
+            if self.__normalize_images:
+                self.__compute_image_normalization_parameters()
+
             # Training
             for self.__epoch in range(0, self.__epochs_count):
                 # Prepare training data, reshuffle for each epoch
@@ -144,9 +153,6 @@ class ModelTrainer:
                     num_workers=self.__workers_count,
                     shuffle=True,
                 )
-                # Compute the mean and stdandard deviation of the training set
-                if self.__normalize_images:
-                    self.__compute_image_normalization_parameters()
 
                 self.__train()
                 self.__validate()
