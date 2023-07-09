@@ -286,7 +286,7 @@ class ModelTrainer:
     ) -> None:
         target_checkpoint_path = path.join(
             self.__checkpoints_dir,
-            f"{self.__model_name}_fold-{self.__fold}_epoch-{self.epoch}.pt",
+            f"{self.__model_name}_fold-{self.__fold}_epoch-{self.__epoch}.pt",
         )
         torch.save(
             {
