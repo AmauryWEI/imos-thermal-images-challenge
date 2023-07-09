@@ -4,6 +4,7 @@
 
 from os import path, makedirs
 
+import numpy as np
 from tqdm import tqdm
 import torch
 from torch.optim import Adam
@@ -138,9 +139,12 @@ class ModelTrainer:
         """
         Main entry point to start training
         """
+        k_folds_losses = []
+
         for self.__fold, (train_data, validation_data) in enumerate(
             self.__k_folds_datasets
         ):
+            epochs_losses = []
             print(f"Fold {self.__fold}:")
 
             # Prepare validation data
@@ -172,9 +176,10 @@ class ModelTrainer:
                     shuffle=True,
                 )
 
-                epoch_mean_loss = self.__train()
-                self.__validate()
-                self.__save_checkpoint(epoch_mean_loss)
+                training_losses = self.__train()
+                epochs_losses.append(training_losses)
+                validation_losses = self.__validate()
+                self.__save_checkpoint(training_losses, validation_losses)
 
     def __compute_image_normalization_parameters(self):
         images, _, _ = next(iter(self.__train_data_loader))
@@ -183,17 +188,17 @@ class ModelTrainer:
             [0, 2, 3]
         ), images.std([0, 2, 3])
 
-    def __train(self) -> float:
+    def __train(self) -> list[float]:
         """
         Train model weights and track performance
 
         Returns
         -------
-        float
-            Mean training loss of the epoch
+        list[float]
+            Loss of each batch during this epoch
         """
-        training_loss = 0.0
-        training_losses_count = 0
+        batches_losses = []
+
         transform = transforms.Normalize(
             self.__training_image_mean, self.__training_image_std
         )
@@ -224,8 +229,7 @@ class ModelTrainer:
             loss.backward()
 
             # Keep track of the loss
-            training_loss = training_loss + loss.item()
-            training_losses_count = training_losses_count + 1
+            batches_losses.append(loss.item())
 
             # Weight learning
             self.__optimizer.step()
@@ -233,21 +237,28 @@ class ModelTrainer:
             # Store performance metrics and update loss on status bar
             tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}", refresh=False)
 
-        mean_loss = training_loss / training_losses_count
-        print(f"Epoch {self.__epoch}: Mean training loss {mean_loss:.2f}")
+        print(f"Epoch {self.__epoch}: Mean training loss {np.mean(batches_losses):.2f}")
 
-        return mean_loss
+        return batches_losses
 
-    def __validate(self):
-        validation_loss = 0.0
-        validation_losses_count = 0
+    def __validate(self) -> list[float]:
+        """
+        Validate model weights and track performance (no training)
+
+        Returns
+        -------
+        list[float]
+            Loss of each batch during this validation stage
+        """
+        batches_losses = []
+
         # Evaluation mode. Disable running mean and variance of batch normalization
         self.__model.eval()
 
         # Turn off gradient to prevent autograd in backward pass, saves memory
         with torch.no_grad():
             for image, metadata, temperature in tqdm(
-                self.__validation_data_loader, desc=f"Validation Fold {self.__fold+1}"
+                self.__validation_data_loader, desc=f"Validation Fold {self.__fold}"
             ):
                 # Assign tensors to target computing device
                 image = image.to(self.__device, dtype=torch.float)
@@ -259,15 +270,21 @@ class ModelTrainer:
                 loss = self.__loss_function(output, temperature)
 
                 # Keep track of the loss
-                validation_loss = validation_loss + loss.item()
-                validation_losses_count = validation_losses_count + 1
+                batches_losses.append(loss.item())
 
         # Obtain and save mean performance for this round
-        mean_loss = validation_loss / validation_losses_count
-        print(f"Epoch {self.__epoch}: Mean validation loss {mean_loss:.2f}")
+        print(
+            f"Epoch {self.__epoch}: Mean validation loss {np.mean(batches_losses):.2f}"
+        )
 
-    def __save_checkpoint(self, epoch_mean_loss: float) -> None:
-        path = path.join(
+        return batches_losses
+
+    def __save_checkpoint(
+        self,
+        training_losses: list[float],
+        validation_losses: list[float],
+    ) -> None:
+        target_checkpoint_path = path.join(
             self.__checkpoints_dir,
             f"{self.__model_name}_fold-{self.__fold}_epoch-{self.epoch}.pt",
         )
@@ -276,11 +293,14 @@ class ModelTrainer:
                 "epoch": self.__epoch,
                 "model_state_dict": self.__model.state_dict(),
                 "optimizer_state_dict": self.__optimizer.state_dict(),
-                "loss": epoch_mean_loss,
+                "training_loss_mean": np.mean(training_losses),
+                "training_losses": training_losses,
+                "validation_loss_mean": np.mean(validation_losses),
+                "validation_losses": validation_losses,
                 "training_image_mean": self.__training_image_mean,
                 "training_image_std": self.__training_image_std,
             },
-            path,
+            target_checkpoint_path,
         )
 
     def __load_checkpoint(self, checkpoint_file_path: str) -> None:
