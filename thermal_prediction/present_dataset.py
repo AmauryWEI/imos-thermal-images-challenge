@@ -79,7 +79,7 @@ def show_metadata_distribution(dataset: ThermalDataset) -> None:
     plot_histogram(axes[0, 2], 50, dataset, "Dew Point", "°C")
     plot_histogram(axes[1, 0], 50, dataset, "Wind Direction", "deg")
     plot_histogram(axes[1, 1], 50, dataset, "Wind Speed", "m/s")
-    plot_histogram(axes[1, 2], 50, dataset, "Sun Radiation Intensity", "W")
+    plot_histogram(axes[1, 2], 50, dataset, "Sun Radiation Intensity", "W/m2")
     plot_histogram(axes[2, 0], 50, dataset, "Min of sunshine latest 10 min", "min")
     plot_histogram(axes[2, 1], 50, dataset, "Day", "u")
     plot_histogram(axes[2, 2], 50, dataset, "Hour", "u")
