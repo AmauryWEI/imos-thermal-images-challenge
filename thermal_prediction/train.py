@@ -90,7 +90,8 @@ def main(args: argparse.Namespace) -> int:
     # Load the dataset
     dataset = ThermalDataset(
         metadata_abs_path,
-        augmentation=False,
+        normalize=True,
+        augment=False,
     )
 
     # Load a model
