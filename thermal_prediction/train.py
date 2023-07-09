@@ -55,6 +55,14 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-b",
+    "--batch",
+    help="Batch size",
+    type=int,
+    default=50,
+)
+
+parser.add_argument(
     "-c",
     "--checkpoint",
     help="Initial model checkpoint to load before training",
@@ -67,6 +75,7 @@ def train(
     dataset: Dataset,
     model: Module,
     epochs_count: int,
+    batch_size: int,
     normalize_images: bool,
     device: torch.device,
     checkpoint: str,
@@ -76,7 +85,7 @@ def train(
         model=model,
         dataset=dataset,
         epochs_count=epochs_count,
-        batch_size=50,
+        batch_size=batch_size,
         learning_rate=1e-3,
         workers_count=1,
         k_folds=5,
@@ -142,6 +151,7 @@ def main(args: argparse.Namespace) -> int:
         dataset,
         model,
         epochs_count=args.epochs,
+        batch_size=args.batch,
         normalize_images=True,
         device=device,
         checkpoint=args.checkpoint,
