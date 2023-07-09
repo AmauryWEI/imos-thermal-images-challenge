@@ -32,6 +32,7 @@ class ModelTrainer:
         k_folds: int,
         normalize_images: bool = True,
         device: torch.device = torch.device("cpu"),
+        model_name: str = "model",
         checkpoints_dir: str = "checkpoints",
     ) -> None:
         self.__model = model.to(device)
@@ -53,6 +54,7 @@ class ModelTrainer:
         self.__train_data_loader = None
         self.__validation_data_loader = None
 
+        self.__model_name = model_name
         self.__checkpoints_dir = path.abspath(checkpoints_dir)
         if not path.exists(self.__checkpoints_dir):
             makedirs(self.__checkpoints_dir)
@@ -257,7 +259,8 @@ class ModelTrainer:
 
     def __save_checkpoint(self, epoch_mean_loss: float) -> None:
         path = path.join(
-            self.__checkpoints_dir, f"fold-{self.__fold}_epoch-{self.epoch}.pt"
+            self.__checkpoints_dir,
+            f"{self.__model_name}_fold-{self.__fold}_epoch-{self.epoch}.pt",
         )
         torch.save(
             {
