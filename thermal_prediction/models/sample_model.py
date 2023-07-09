@@ -11,7 +11,7 @@ class SampleModel(Module):
     Basic Convolutional Neural Network with 3x3 kernels and batch normalization for
     temperature prediction on the Long-term Thermal Drift Dataset.
 
-    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 7 x 1)
+    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 9 x 1)
     Output: Temperature (float)
     """
 
@@ -68,7 +68,7 @@ class SampleModel(Module):
         ################
         # MLP Components
         ################
-        self.mlp_fc = Linear(7, self.__mlp_output_size)
+        self.mlp_fc = Linear(9, self.__mlp_output_size)
 
         ################
         # Single output = temperature
