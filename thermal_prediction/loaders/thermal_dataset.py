@@ -77,6 +77,10 @@ class ThermalDataset(Dataset):
         if self.__normalize:
             self.__normalize_metadata()
 
+    @property
+    def metadata(self) -> pd.DataFrame:
+        return self.__metadata
+
     def __len__(self) -> int:
         return len(self.__metadata.index)
 
