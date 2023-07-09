@@ -100,6 +100,7 @@ class SampleModel(Module):
 
         # Network Out with CNN Out and MLP Out
         out = cat((cnn_out, mlp_out), 1)
-        out = relu(self.out_fc(out))
+        # No activation function to output a continuous value
+        out = self.out_fc(out)
 
         return out
