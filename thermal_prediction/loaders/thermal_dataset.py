@@ -125,7 +125,7 @@ class ThermalDataset(Dataset):
 
         for _, row in self.__metadata.iterrows():
             # Convert the "DateTime" string to an actual Python object
-            datetime_object = datetime.strptime(row["DateTime"], "%d/%m/%y %H:%M")
+            datetime_object = datetime.strptime(row["DateTime"], "%Y-%m-%d %H:%M:%S")
             # Find out the first day of the year the image was taken in
             year_start = datetime_object.replace(month=1).replace(day=1)
             # Assign the "Day" column to a number of days (will be in [0 - 365])
