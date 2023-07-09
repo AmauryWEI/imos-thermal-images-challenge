@@ -52,6 +52,7 @@ def train(
     dataset: Dataset,
     model: Module,
     epochs_count: int,
+    normalize_images: bool,
     device: torch.device,
 ) -> None:
     model_trainer = ModelTrainer(
@@ -62,6 +63,7 @@ def train(
         learning_rate=1e-3,
         workers_count=1,
         k_folds=5,
+        normalize_images=normalize_images,
         device=device,
     )
     model_trainer.run()
@@ -105,7 +107,13 @@ def main(args: argparse.Namespace) -> int:
         )
 
     # Train the model
-    train(dataset, model, epochs_count=args.epochs, device=device)
+    train(
+        dataset,
+        model,
+        epochs_count=args.epochs,
+        normalize_images=True,
+        device=device,
+    )
 
     return 0
 
