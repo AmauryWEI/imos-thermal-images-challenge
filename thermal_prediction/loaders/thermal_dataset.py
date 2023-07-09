@@ -120,8 +120,8 @@ class ThermalDataset(Dataset):
 
     def __create_day_and_hour_columns(self) -> None:
         # Create empty columns in the DataFrame
-        self.__metadata["Day"] = ""
-        self.__metadata["Hour"] = ""
+        self.__metadata["Day"] = 0
+        self.__metadata["Hour"] = 0
 
         for _, row in self.__metadata.iterrows():
             # Convert the "DateTime" string to an actual Python object
