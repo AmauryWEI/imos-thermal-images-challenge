@@ -122,7 +122,22 @@ class ThermalDataset(Dataset):
         return image
 
     def __metadata_as_tensor(self, index: int) -> Tensor:
-        return Tensor(self.__metadata.iloc[index, 5:12])
+        """
+        Return the metadata at a specific index in the dataset
+
+        Parameters
+        ----------
+        index : int
+            Target index in the dataset
+
+        Returns
+        -------
+        Tensor
+            Metadata tensor with columns
+            "Humidity", "Precipitation", "Dew Point", "Wind Direction", "Wind Speed",
+            "Sun Radiation Intensity", "Min of sunshine latest 10 min", "Day", "Hour"
+        """
+        return Tensor(self.__metadata.iloc[index, 5:14])
 
     def __create_day_and_hour_columns(self) -> None:
         # Create empty columns in the DataFrame
