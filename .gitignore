@@ -167,3 +167,6 @@ dataset/Data_Annotated_Subset_Object_Detectors/
 dataset/Data_Subset_Autoencoders_Anomaly_Detectors/
 dataset/LTD_Dataset/
 *.zip
+
+# Pytorch checkpoints
+**/*.pt

@@ -50,6 +50,7 @@ To generate the dataset of unique thermal images, run the following command:
 
     ```zsh
     pyenv shell imos    # Activate the virtual environment
+    cd dataset/LTD_Dataset/LTD_Dataset
     python extract_images.py
     ```
 

@@ -5,3 +5,7 @@ torch
 torchvision
 torchaudio
 opencv-python
+tqdm
+scipy
+black
+matplotlib

@@ -165,7 +165,7 @@ def split_dataset(
 
     # Split the dataset into training, validation, and testing
     training, validation, testing = np.split(
-        shuffled_metadata, [training_images_count, validation_images_count]
+        shuffled_metadata, [training_images_count, training_images_count + validation_images_count]
     )
 
     if not quiet:
