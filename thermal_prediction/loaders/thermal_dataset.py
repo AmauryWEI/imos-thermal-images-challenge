@@ -32,6 +32,7 @@ class ThermalDataset(Dataset):
         self,
         metadata_abs_path: str,
         images_abs_path: str,
+        grayscale_to_rgb: bool = False,
         normalize: bool = True,
         augment: bool = False,
         quiet: bool = False,
@@ -54,6 +55,7 @@ class ThermalDataset(Dataset):
         """
         self.__metadata_abs_path = metadata_abs_path
         self.__images_abs_path = images_abs_path
+        self.__grayscale_to_rgb = grayscale_to_rgb
         self.__normalize = normalize
         self.__quiet = quiet
 
@@ -128,9 +130,10 @@ class ThermalDataset(Dataset):
             data_frame_row["Clip Name"],
             data_frame_row["Image Number"] + ".jpg",
         )
-        image = read_image(image_abs_path)
-
-        return image
+        if self.__grayscale_to_rgb:
+            return read_image(image_abs_path).repeat(3, 1, 1)
+        else:
+            return read_image(image_abs_path)
 
     def __metadata_as_tensor(self, index: int) -> Tensor:
         """
