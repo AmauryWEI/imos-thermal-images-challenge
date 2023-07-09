@@ -256,10 +256,11 @@ class ModelTrainer:
         self.__model.eval()
 
         # Turn off gradient to prevent autograd in backward pass, saves memory
+        tqdm_iterator = tqdm(
+            self.__validation_data_loader, desc=f"Validation Fold {self.__fold}"
+        )
         with torch.no_grad():
-            for image, metadata, temperature in tqdm(
-                self.__validation_data_loader, desc=f"Validation Fold {self.__fold}"
-            ):
+            for image, metadata, temperature in tqdm_iterator:
                 # Assign tensors to target computing device
                 image = image.to(self.__device, dtype=torch.float)
                 metadata = metadata.to(self.__device, dtype=torch.float)
@@ -271,6 +272,9 @@ class ModelTrainer:
 
                 # Keep track of the loss
                 batches_losses.append(loss.item())
+
+                # Store performance metrics and update loss on status bar
+                tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}", refresh=False)
 
         # Obtain and save mean performance for this round
         print(
