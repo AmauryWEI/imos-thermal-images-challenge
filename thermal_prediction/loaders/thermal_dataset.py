@@ -33,6 +33,7 @@ class ThermalDataset(Dataset):
         metadata_abs_path: str,
         normalize: bool = True,
         augment: bool = False,
+        quiet: bool = False,
     ) -> None:
         """
         Initialize the ThermalDataset class
@@ -43,9 +44,12 @@ class ThermalDataset(Dataset):
             Absolute path to the metadata_images.csv file
         augmentation : bool, optional
             Augment the dataset, by default False
+        quiet: bool, optional
+            No log output, by default False
         """
         self.__dataset_root_dir = path.dirname(metadata_abs_path)
         self.__normalize = normalize
+        self.__quiet = quiet
 
         # Load the metadata CSV file
         self.__metadata = pd.read_csv(metadata_abs_path)
@@ -53,6 +57,8 @@ class ThermalDataset(Dataset):
             raise RuntimeError(
                 "Unexpected columns headers: ", list(self.__metadata.columns.values)
             )
+        if not self.__quiet:
+            print("ThermalDataset: metadata loaded")
 
         # Convert the string date to day of the year + hour
         self.__create_day_and_hour_columns()
@@ -133,8 +139,12 @@ class ThermalDataset(Dataset):
             # Assign the "Hour" column to a number of minutes (will be in [0 - (24*60 - 1)])
             row["Hour"] = datetime_object.hour * 60 + datetime_object.minute
 
+        if not self.__quiet:
+            print("ThermalDataset: 'Day' and 'Hour' columns created")
+
     def __normalize_metadata(self) -> None:
         pass
 
     def __compute_image_normalization_params(self) -> None:
-        pass
+        if not self.__quiet:
+            print("ThermalDataset: image normalization parameters computed")
