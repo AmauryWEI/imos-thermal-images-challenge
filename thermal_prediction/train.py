@@ -18,9 +18,10 @@ from thermal_dataset import ThermalDataset
 sys.path.append("./models/")
 from sample_model import SampleModel
 from resnet_models import ResNet50_RgbNoMetadata, ResNet50_RgbMetadata
+from cnn_models import CnnModel
 from model_trainer import ModelTrainer, parameters_count
 
-GRAYSCALE_MODELS = ["SampleModel"]
+GRAYSCALE_MODELS = ["SampleModel", "CnnModel"]
 RGB_MODELS = ["ResNet50NoMetadata", "ResNet50"]
 
 # Define the arguments/options of the script
@@ -90,6 +91,8 @@ def requires_rgb(model: str) -> None:
 def model_from_name(model_name: str) -> Module:
     if model_name == "SampleModel":
         return SampleModel()
+    if model_name == "CnnModel":
+        return CnnModel()
     elif model_name == "ResNet50NoMetadata":
         return ResNet50_RgbNoMetadata()
     elif model_name == "ResNet50":
@@ -178,6 +181,7 @@ def main(args: argparse.Namespace) -> int:
             f"Parameters: {total_params} ; Trainable: {trainable_params} "
             f"({trainable_params / total_params * 100:.4f} [%])\n"
         )
+        print(model)
 
     # Train the model
     train(
