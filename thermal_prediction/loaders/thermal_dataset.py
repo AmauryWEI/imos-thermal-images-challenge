@@ -73,7 +73,6 @@ class ThermalDataset(Dataset):
         # Compute normalization parameters
         if self.__normalize:
             self.__normalize_metadata()
-            self.__compute_image_normalization_params()
 
     def __len__(self) -> int:
         return len(self.__metadata.index)
@@ -203,7 +202,3 @@ class ThermalDataset(Dataset):
 
         if not self.__quiet:
             print("ThermalDataset: metadata columns normalized")
-
-    def __compute_image_normalization_params(self) -> None:
-        if not self.__quiet:
-            print("ThermalDataset: image normalization parameters computed")
