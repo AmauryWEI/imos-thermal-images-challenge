@@ -242,7 +242,7 @@ class ModelTrainer:
         validation_loss = 0.0
         validation_losses_count = 0
         # Evaluation mode. Disable running mean and variance of batch normalization
-        self.model.eval()
+        self.__model.eval()
 
         # Turn off gradient to prevent autograd in backward pass, saves memory
         with torch.no_grad():
@@ -255,7 +255,7 @@ class ModelTrainer:
                 temperature = temperature.to(self.__device)
 
                 # Inference prediction by model and obtain loss
-                output = self.model(image)
+                output = self.__model(image, metadata)
                 loss = self.__loss_function(output, temperature)
 
                 # Keep track of the loss
