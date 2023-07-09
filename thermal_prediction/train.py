@@ -192,7 +192,7 @@ def main(args: argparse.Namespace) -> int:
         normalize_images=True,
         device=device,
         checkpoint=args.checkpoint,
-        model_name="sample-model",
+        model_name=args.model,
     )
 
     return 0
