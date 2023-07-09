@@ -17,7 +17,11 @@ from thermal_dataset import ThermalDataset
 
 sys.path.append("./models/")
 from sample_model import SampleModel
+from resnet_models import ResNet50_RgbNoMetadata, ResNet50_RgbMetadata
 from model_trainer import ModelTrainer, parameters_count
+
+GRAYSCALE_MODELS = ["SampleModel"]
+RGB_MODELS = ["ResNet50NoMetadata", "ResNet50"]
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -47,6 +51,14 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-m",
+    "--model",
+    help="Model to use",
+    type=str,
+    default="sample_model",
+)
+
+parser.add_argument(
     "-e",
     "--epochs",
     help="Number of epochs during training",
@@ -69,6 +81,21 @@ parser.add_argument(
     type=str,
     default="",
 )
+
+
+def requires_rgb(model: str) -> None:
+    return True if model in RGB_MODELS else False
+
+
+def model_from_name(model_name: str) -> Module:
+    if model_name == "SampleModel":
+        return SampleModel()
+    elif model_name == "ResNet50NoMetadata":
+        return ResNet50_RgbNoMetadata()
+    elif model_name == "ResNet50":
+        return ResNet50_RgbMetadata()
+    else:
+        raise ValueError(f"Unknown model name: {model_name}")
 
 
 def train(
@@ -110,7 +137,7 @@ def main(args: argparse.Namespace) -> int:
         print("Metadata file\t: {}".format(metadata_abs_path))
     images_dir_abs_path = path.abspath(args.images_dir)
     if not args.quiet:
-        print("Images folder\t: {}".format(images_dir_abs_path))
+        print("Images folder\t: {}\n".format(images_dir_abs_path))
 
     # Make sure the target CSV file exists
     if not path.exists(metadata_abs_path):
@@ -128,22 +155,28 @@ def main(args: argparse.Namespace) -> int:
         print("ERROR: ", images_dir_abs_path, " is not a directory.")
         return 1
 
+    # Make sure the model is known
+    if args.model not in GRAYSCALE_MODELS and args.model not in RGB_MODELS:
+        print(f"ERROR: Unknown model {args.model}")
+        return 1
+
     # Load the dataset
     dataset = ThermalDataset(
         metadata_abs_path,
         images_abs_path=images_dir_abs_path,
+        grayscale_to_rgb=requires_rgb(args.model),
         normalize=True,
         augment=False,
     )
 
     # Load a model
-    model = SampleModel().to(device)
+    model = model_from_name(args.model).to(device)
     if not args.quiet:
         total_params, trainable_params = parameters_count(model)
-        print(model)
+        print(f"\nModel: {args.model}")
         print(
             f"Parameters: {total_params} ; Trainable: {trainable_params} "
-            f"({trainable_params / total_params * 100} [%])"
+            f"({trainable_params / total_params * 100} [%])\n"
         )
 
     # Train the model
