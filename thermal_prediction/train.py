@@ -176,7 +176,7 @@ def main(args: argparse.Namespace) -> int:
         print(f"\nModel: {args.model}")
         print(
             f"Parameters: {total_params} ; Trainable: {trainable_params} "
-            f"({trainable_params / total_params * 100} [%])\n"
+            f"({trainable_params / total_params * 100:.4f} [%])\n"
         )
 
     # Train the model
