@@ -32,6 +32,7 @@ class ModelTrainer:
         k_folds: int,
         normalize_images: bool = True,
         device: torch.device = torch.device("cpu"),
+        load_checkpoint_file: str = "",
         model_name: str = "model",
         checkpoints_dir: str = "checkpoints",
     ) -> None:
@@ -42,6 +43,7 @@ class ModelTrainer:
         self.__training_image_mean = 0
         self.__training_image_std = 1
 
+        self.__starting_epoch = 0
         self.__epochs_count = epochs_count
         self.__batch_size = batch_size
         self.__workers_count = workers_count
@@ -70,6 +72,10 @@ class ModelTrainer:
             self.__k_folds_datasets = self.__split_k_folds(
                 dataset, k_folds, randomize=True
             )
+
+        # Just before starting, load a checkpoint file if available
+        if len(load_checkpoint_file) > 0:
+            self.__load_checkpoint(self.__load_checkpoint_file)
 
     def __split_dataset(
         self,
@@ -154,7 +160,10 @@ class ModelTrainer:
                 self.__compute_image_normalization_parameters()
 
             # Training
-            for self.__epoch in range(0, self.__epochs_count):
+            for self.__epoch in range(
+                self.__starting_epoch,
+                self.__starting_epoch + self.__epochs_count,
+            ):
                 # Prepare training data, reshuffle for each epoch
                 self.__train_data_loader = DataLoader(
                     train_data,
@@ -273,6 +282,21 @@ class ModelTrainer:
             },
             path,
         )
+
+    def __load_checkpoint(self, checkpoint_file_path: str) -> None:
+        if not self.__quiet:
+            print(f"ModelTrainer: loading checkpoint {checkpoint_file_path}")
+
+        # Make sure the target checkpoint file exists
+        if not path.exists(checkpoint_file_path):
+            raise RuntimeError(f"Checkpoint {checkpoint_file_path} does not exist.")
+        if not path.isfile(checkpoint_file_path):
+            raise (f"{checkpoint_file_path} is not a file.")
+
+        checkpoint = torch.load(checkpoint_file_path, map_location=self.__device)
+        self.__starting_epoch = checkpoint["epoch"] + 1
+        self.__model.load_state_dict(checkpoint["model_state_dict"])
+        self.__optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
 
 def parameters_count(model: Module) -> tuple[int, int]:
