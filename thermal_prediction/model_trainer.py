@@ -203,7 +203,7 @@ class ModelTrainer:
         batches_losses = []
 
         transform = transforms.Normalize(
-            self.__training_image_mean, self.__training_image_std
+            self.__training_image_mean, 255 * self.__training_image_std
         )
 
         # Turn on training mode to enable gradient computation
