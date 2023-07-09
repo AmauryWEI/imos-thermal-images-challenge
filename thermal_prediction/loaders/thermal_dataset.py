@@ -42,7 +42,9 @@ class ThermalDataset(Dataset):
         ----------
         metadata_abs_path : str
             Absolute path to the metadata_images.csv file
-        augmentation : bool, optional
+        normalize: bool, optional
+            Normalize the images and metadata, by default True
+        augment: bool, optional
             Augment the dataset, by default False
         quiet: bool, optional
             No log output, by default False
@@ -158,7 +160,49 @@ class ThermalDataset(Dataset):
             print("ThermalDataset: 'Day' and 'Hour' columns created")
 
     def __normalize_metadata(self) -> None:
-        pass
+        # Normalize the "Humidity" column (between 0 and 100 [%])
+        self.__metadata["Humidity"] = self.__metadata["Humidity"] / 100
+
+        # Normalize the "Precipitation" column
+        mean = self.__metadata["Precipitation"].mean()
+        std = self.__metadata["Precipitation"].std()
+        self.__metadata["Precipitation"] = (
+            self.__metadata["Precipitation"] - mean
+        ) / std
+
+        # Normalize the "Dew Point" column
+        mean = self.__metadata["Dew Point"].mean()
+        std = self.__metadata["Dew Point"].std()
+        self.__metadata["Dew Point"] = (self.__metadata["Dew Point"] - mean) / std
+
+        # Normalize the "Wind Direction" column (between 0 and 360 [deg])
+        self.__metadata["Wind Direction"] = self.__metadata["Wind Direction"] / 360.0
+
+        # Normalize the "Wind Speed" column
+        mean = self.__metadata["Wind Speed"].mean()
+        std = self.__metadata["Wind Speed"].std()
+        self.__metadata["Wind Speed"] = (self.__metadata["Wind Speed"] - mean) / std
+
+        # Normalize the "Sun Radiation Intensity" column
+        mean = self.__metadata["Sun Radiation Intensity"].mean()
+        std = self.__metadata["Sun Radiation Intensity"].std()
+        self.__metadata["Sun Radiation Intensity"] = (
+            self.__metadata["Sun Radiation Intensity"] - mean
+        ) / std
+
+        # Normalize the "Min of sunshine latest 10 min" column (between 0 and 10 [min])
+        self.__metadata["Min of sunshine latest 10 min"] = (
+            self.__metadata["Min of sunshine latest 10 min"] / 10.0
+        )
+
+        # Normalize the "Day" column (between 0 and 365 [days])
+        self.__metadata["Day"] = self.__metadata["Day"] / 365.0
+
+        # Normalize the "Hour" column (between 0 and 1439 [min])
+        self.__metadata["Hour"] = self.__metadata["Hour"] / (24.0 * 60 - 1)
+
+        if not self.__quiet:
+            print("ThermalDataset: metadata columns normalized")
 
     def __compute_image_normalization_params(self) -> None:
         if not self.__quiet:
