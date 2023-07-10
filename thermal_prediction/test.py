@@ -123,7 +123,7 @@ def test(
         model=model,
         dataset=dataset,
         batch_size=batch_size,
-        workers_count=1,
+        workers_count=4,
         load_checkpoint_file=checkpoint,
         save_predictions=save_predictions,
         device=device,
