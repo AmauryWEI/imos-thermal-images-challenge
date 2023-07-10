@@ -5,7 +5,6 @@
 from torch import Tensor, relu, cat
 from torch.nn import Module, Linear
 from torchvision.models import resnet50, ResNet50_Weights
-from torchvision import transforms
 
 
 class ResNet50_RgbNoMetadata(Module):
@@ -24,21 +23,12 @@ class ResNet50_RgbNoMetadata(Module):
 
         self.__resnet_preprocess = ResNet50_Weights.DEFAULT.transforms(antialias=False)
 
-        # ResNet50 normalizes the images assuming they are from the ImageNet dataset
-        # Our images are already normalized based on the actual LTD dataset values
-        self.__revert_resnet_normalization = transforms.Normalize(
-            mean=[-0.485 / 0.229, -0.456 / 0.224, -0.406 / 0.255],
-            std=[1 / 0.229, 1 / 0.224, 1 / 0.255],
-        )
-
         # Output a single temperature value instead of 1000 classes
         self.__resnet.fc = Linear(2048, 1)
 
     def forward(self, image: Tensor, metadata: Tensor):
         # ResNet forward
-        return self.__resnet.forward(
-            self.__revert_resnet_normalization(self.__resnet_preprocess(image))
-        )
+        return self.__resnet.forward(self.__resnet_preprocess(image))
 
 
 class ResNet50_RgbMetadata(Module):
@@ -60,13 +50,6 @@ class ResNet50_RgbMetadata(Module):
 
         self.__resnet_preprocess = ResNet50_Weights.DEFAULT.transforms(antialias=False)
 
-        # ResNet50 normalizes the images assuming they are from the ImageNet dataset
-        # Our images are already normalized based on the actual LTD dataset values
-        self.__revert_resnet_normalization = transforms.Normalize(
-            mean=[-0.485 / 0.229, -0.456 / 0.224, -0.406 / 0.255],
-            std=[1 / 0.229, 1 / 0.224, 1 / 0.255],
-        )
-
         self.__mlp = Linear(9, self.__mlp_output_size)
 
         # The output of ResNet50 is 1000
@@ -74,7 +57,7 @@ class ResNet50_RgbMetadata(Module):
 
     def forward(self, image: Tensor, metadata: Tensor):
         # ResNet image processing
-        image = self.__revert_resnet_normalization(self.__resnet_preprocess(image))
+        image = self.__resnet_preprocess(image)
         resnet_out = self.__resnet.forward(image)
 
         # MLP metadata processing
