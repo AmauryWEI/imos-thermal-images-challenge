@@ -70,7 +70,7 @@ class ModelTrainer:
 
         # Just before starting, load a checkpoint file if available
         if len(load_checkpoint_file) > 0:
-            self.__load_checkpoint(self.__load_checkpoint_file)
+            self.__load_checkpoint(load_checkpoint_file)
 
     def __split_dataset(
         self,
