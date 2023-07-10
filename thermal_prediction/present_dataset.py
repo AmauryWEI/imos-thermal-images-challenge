@@ -120,6 +120,7 @@ def main(args: argparse.Namespace) -> int:
     dataset = ThermalDataset(
         metadata_abs_path,
         images_abs_path=images_dir_abs_path,
+        grayscale_to_rgb=True,
         normalize=False,
         augment=False,
     )
