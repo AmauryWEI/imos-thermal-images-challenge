@@ -8,7 +8,7 @@ import numpy as np
 from tqdm import tqdm
 import torch
 from torch.optim import Adam
-from torch.nn import Module, MSELoss
+from torch.nn import Module, MSELoss, L1Loss
 from torch.utils.data import Dataset, DataLoader, Subset, ConcatDataset, random_split
 
 
@@ -43,6 +43,7 @@ class ModelTrainer:
         self.__workers_count = workers_count
 
         self.__loss_function = MSELoss()
+        self.__mae_loss_function = L1Loss()
         self.__optimizer = Adam(model.parameters(), lr=learning_rate)
 
         self.__fold = 0
@@ -217,9 +218,11 @@ class ModelTrainer:
             self.__optimizer.step()
 
             # Store performance metrics and update loss on status bar
-            tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}")
+            tqdm_iterator.set_postfix_str(f"MSE Loss: {loss.item():.3e}")
 
-        print(f"Epoch {self.__epoch}: Mean training loss {np.mean(batches_losses):.2f}")
+        print(
+            f"Epoch {self.__epoch}: Mean training MSE Loss {np.mean(batches_losses):.4f}"
+        )
 
         return batches_losses
 
@@ -233,6 +236,7 @@ class ModelTrainer:
             Loss of each batch during this validation stage
         """
         batches_losses = []
+        batches_mae_losses = []
 
         # Evaluation mode. Disable running mean and variance of batch normalization
         self.__model.eval()
@@ -251,16 +255,19 @@ class ModelTrainer:
                 # Inference prediction by model and obtain loss
                 output = self.__model(image, metadata)
                 loss = self.__loss_function(output, temperature)
+                mae_loss = self.__mae_loss_function(output, temperature)
 
                 # Keep track of the loss
                 batches_losses.append(loss.item())
+                batches_mae_losses.append(mae_loss.item())
 
                 # Store performance metrics and update loss on status bar
-                tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}")
+                tqdm_iterator.set_postfix_str(f"MSE Loss: {loss.item():.3e}")
 
-        # Print mean performance for this round
+        # Print mean performance for this epoch
         print(
-            f"Epoch {self.__epoch}: Mean validation loss {np.mean(batches_losses):.2f}"
+            f"Epoch {self.__epoch}: Mean validation MSE Loss: {np.mean(batches_losses):.4f} "
+            f"(MAE Loss: {np.mean(batches_mae_losses):.4f})"
         )
 
         return batches_losses
