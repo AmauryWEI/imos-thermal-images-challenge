@@ -13,7 +13,6 @@ from torch.utils.data import Dataset, DataLoader, Subset, ConcatDataset, random_
 
 
 class ModelTrainer:
-
     """
     A training worker for neural network models.
 
