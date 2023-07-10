@@ -50,7 +50,11 @@ class ModelTrainer:
         self.__train_data_loader = None
         self.__validation_data_loader = None
 
-        self.__model_name = model_name
+        # Stored globally to keep track of all losses in each checkpoint
+        self.__training_losses = []
+        self.__validation_losses = []
+
+        self.__model_name = model_name  # Checkpoints will be saved with this name
         self.__checkpoints_dir = path.abspath(checkpoints_dir)
         if not path.exists(self.__checkpoints_dir):
             makedirs(self.__checkpoints_dir)
@@ -133,13 +137,10 @@ class ModelTrainer:
         """
         Main entry point to start training
         """
-        k_folds_losses = []
-
         for self.__fold, (train_data, validation_data) in enumerate(
             self.__k_folds_datasets
         ):
-            epochs_losses = []
-            print(f"Fold {self.__fold}:")
+            print(f"ModelTrainer: Fold {self.__fold}:")
 
             # Prepare validation data
             self.__validation_data_loader = DataLoader(
@@ -168,11 +169,14 @@ class ModelTrainer:
                 )
 
                 training_losses = self.__train()
-                epochs_losses.append(deepcopy(training_losses))
                 validation_losses = self.__validate()
-                self.__save_checkpoint(training_losses, validation_losses)
 
-            k_folds_losses.append(deepcopy(epochs_losses))
+                # Update the history of training & validation losses for this fold
+                self.__training_losses.append(training_losses)
+                self.__validation_losses.append(validation_losses)
+
+                # Save the checkpoint (including training & validation losses)
+                self.__save_checkpoint()
 
     def __train(self) -> list[float]:
         """
@@ -254,18 +258,14 @@ class ModelTrainer:
                 # Store performance metrics and update loss on status bar
                 tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}")
 
-        # Obtain and save mean performance for this round
+        # Print mean performance for this round
         print(
             f"Epoch {self.__epoch}: Mean validation loss {np.mean(batches_losses):.2f}"
         )
 
         return batches_losses
 
-    def __save_checkpoint(
-        self,
-        training_losses: list[float],
-        validation_losses: list[float],
-    ) -> None:
+    def __save_checkpoint(self) -> None:
         target_checkpoint_path = path.join(
             self.__checkpoints_dir,
             f"{self.__model_name}_fold-{self.__fold}_epoch-{self.__epoch}.pt",
@@ -275,17 +275,16 @@ class ModelTrainer:
                 "epoch": self.__epoch,
                 "model_state_dict": self.__model.state_dict(),
                 "optimizer_state_dict": self.__optimizer.state_dict(),
-                "training_loss_mean": np.mean(training_losses),
-                "training_losses": training_losses,
-                "validation_loss_mean": np.mean(validation_losses),
-                "validation_losses": validation_losses,
+                "last_training_loss_mean": np.mean(self.__training_losses[-1]),
+                "training_losses": self.__training_losses,
+                "last_validation_loss_mean": np.mean(self.__validation_losses[-1]),
+                "validation_losses": self.__validation_losses,
             },
             target_checkpoint_path,
         )
 
     def __load_checkpoint(self, checkpoint_file_path: str) -> None:
-        if not self.__quiet:
-            print(f"ModelTrainer: loading checkpoint {checkpoint_file_path}")
+        print(f"ModelTrainer: loading checkpoint {checkpoint_file_path}")
 
         # Make sure the target checkpoint file exists
         if not path.exists(checkpoint_file_path):
@@ -297,6 +296,8 @@ class ModelTrainer:
         self.__starting_epoch = checkpoint["epoch"] + 1
         self.__model.load_state_dict(checkpoint["model_state_dict"])
         self.__optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        self.__training_losses = checkpoint["training_losses"]
+        self.__validation_losses = checkpoint["validation_losses"]
 
 
 def parameters_count(model: Module) -> tuple[int, int]:
