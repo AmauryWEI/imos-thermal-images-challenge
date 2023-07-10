@@ -72,7 +72,7 @@ parser.add_argument(
     "--batch",
     help="Batch size",
     type=int,
-    default=50,
+    default=32,
 )
 
 parser.add_argument(
