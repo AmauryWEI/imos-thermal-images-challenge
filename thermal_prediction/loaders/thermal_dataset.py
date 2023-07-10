@@ -9,7 +9,12 @@ import pandas as pd
 from torch import Tensor
 from torch.utils.data import Dataset
 from torchvision.io import read_image, ImageReadMode
-from torchvision.transforms import Compose, RandomHorizontalFlip, RandomVerticalFlip
+from torchvision.transforms import (
+    Compose,
+    RandomHorizontalFlip,
+    RandomVerticalFlip,
+    Resize,
+)
 
 
 RAW_METADATA_COLUMNS = [
@@ -61,6 +66,7 @@ class ThermalDataset(Dataset):
         self.__quiet = quiet
 
         self.__rand_flip = Compose([RandomHorizontalFlip(0.5), RandomVerticalFlip(0.5)])
+        self.__rgb_resize = Resize(224, antialias=True)  # 224 x 224 for ResNet50
 
         # Load the metadata CSV file
         self.__metadata = pd.read_csv(self.__metadata_abs_path)
@@ -134,8 +140,8 @@ class ThermalDataset(Dataset):
             data_frame_row["Image Number"] + ".jpg",
         )
         if self.__grayscale_to_rgb:
-            return self.__rand_flip(
-                read_image(image_abs_path, ImageReadMode.RGB) / 255.0
+            return self.__rgb_resize(
+                self.__rand_flip(read_image(image_abs_path, ImageReadMode.RGB) / 255.0)
             )
         else:
             return self.__rand_flip(
