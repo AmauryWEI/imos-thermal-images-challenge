@@ -6,9 +6,29 @@
 
 
 import argparse
+import sys
 from os import path
 
 import torch
+from torch.nn import Module
+
+sys.path.append("./loaders/")
+from thermal_dataset import ThermalDataset
+
+sys.path.append("./models/")
+from sample_model import SampleModel
+from resnet_models import (
+    ResNet50_RgbNoMetadata,
+    ResNet50_RgbMetadata,
+    ResNet50_RgbMetadataMlp,
+    ResNet18_RgbNoMetadata,
+)
+from cnn_models import CnnModel
+from mlp_models import MlpModel, MlpModelDateTime
+from model_trainer import parameters_count
+
+GRAYSCALE_MODELS = ["SampleModel", "CnnModel", "MlpModel", "MlpModelDateTime"]
+RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp", "ResNet18"]
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -61,6 +81,31 @@ parser.add_argument(
 )
 
 
+def requires_rgb(model: str) -> None:
+    return True if model in RGB_MODELS else False
+
+
+def model_from_name(model_name: str) -> Module:
+    if model_name == "SampleModel":
+        return SampleModel()
+    if model_name == "CnnModel":
+        return CnnModel()
+    if model_name == "MlpModel":
+        return MlpModel()
+    if model_name == "MlpModelDateTime":
+        return MlpModelDateTime()
+    elif model_name == "ResNet50":
+        return ResNet50_RgbNoMetadata()
+    elif model_name == "ResNet50Metadata":
+        return ResNet50_RgbMetadata()
+    elif model_name == "ResNet50MetadataMlp":
+        return ResNet50_RgbMetadataMlp()
+    elif model_name == "ResNet18":
+        return ResNet18_RgbNoMetadata()
+    else:
+        raise ValueError(f"Unknown model name: {model_name}")
+
+
 def main(args: argparse.Namespace) -> int:
     device = torch.device("cpu")
     if torch.backends.mps.is_available():
@@ -102,6 +147,22 @@ def main(args: argparse.Namespace) -> int:
     if not path.isdir(images_dir_abs_path):
         print(f"ERROR: {images_dir_abs_path} is not a directory.")
         return 1
+
+    # Load the dataset
+    dataset = ThermalDataset(
+        metadata_abs_path,
+        images_abs_path=images_dir_abs_path,
+        grayscale_to_rgb=requires_rgb(args.model),
+        normalize=True,
+        augment=False,
+    )
+
+    # Load a model
+    model = model_from_name(args.model).to(device)
+    if not args.quiet:
+        total_params, _ = parameters_count(model)
+        print(f"\nModel: {args.model} (Parameters: {total_params})")
+        print(model)
 
     return 0
 
