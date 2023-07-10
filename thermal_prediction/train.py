@@ -82,6 +82,14 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-f",
+    "--folds",
+    help="K-folds cross-validation",
+    type=int,
+    default=0,
+)
+
+parser.add_argument(
     "-c",
     "--checkpoint",
     help="Initial model checkpoint to load before training",
@@ -118,6 +126,7 @@ def train(
     model: Module,
     epochs_count: int,
     batch_size: int,
+    folds: int,
     device: torch.device,
     checkpoint: str,
     model_name: str,
@@ -129,7 +138,7 @@ def train(
         batch_size=batch_size,
         learning_rate=1e-4,
         workers_count=1,
-        k_folds=5,
+        k_folds=folds,
         device=device,
         load_checkpoint_file=checkpoint,
         model_name=model_name,
@@ -201,6 +210,7 @@ def main(args: argparse.Namespace) -> int:
         model,
         epochs_count=args.epochs,
         batch_size=args.batch,
+        folds=args.folds,
         device=device,
         checkpoint=args.checkpoint,
         model_name=args.model,
