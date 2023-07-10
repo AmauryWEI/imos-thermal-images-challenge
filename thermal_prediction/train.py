@@ -97,6 +97,14 @@ parser.add_argument(
     default="",
 )
 
+parser.add_argument(
+    "-lr",
+    "--learning_rate",
+    help="Learning rate (for Adam optimizer)",
+    type=float,
+    default=1e-4,
+)
+
 
 def requires_rgb(model: str) -> None:
     return True if model in RGB_MODELS else False
@@ -128,6 +136,7 @@ def train(
     model: Module,
     epochs_count: int,
     batch_size: int,
+    learning_rate: float,
     folds: int,
     device: torch.device,
     checkpoint: str,
@@ -138,7 +147,7 @@ def train(
         dataset=dataset,
         epochs_count=epochs_count,
         batch_size=batch_size,
-        learning_rate=1e-4,
+        learning_rate=learning_rate,
         workers_count=1,
         k_folds=folds,
         device=device,
@@ -212,6 +221,7 @@ def main(args: argparse.Namespace) -> int:
         model,
         epochs_count=args.epochs,
         batch_size=args.batch,
+        learning_rate=args.learning_rate,
         folds=args.folds,
         device=device,
         checkpoint=args.checkpoint,
