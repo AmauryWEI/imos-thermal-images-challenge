@@ -32,7 +32,6 @@ class ModelTrainer:
         learning_rate: int,
         workers_count: int,
         k_folds: int,
-        normalize_images: bool = True,
         device: torch.device = torch.device("cpu"),
         load_checkpoint_file: str = "",
         model_name: str = "model",
@@ -41,7 +40,6 @@ class ModelTrainer:
         self.__model = model.to(device)
         self.__device = device
 
-        self.__normalize_images = normalize_images
         self.__training_image_mean = 0
         self.__training_image_std = 1
 
@@ -161,9 +159,6 @@ class ModelTrainer:
                 batch_size=self.__batch_size,
                 num_workers=self.__workers_count,
             )
-            if self.__normalize_images:
-                self.__compute_image_normalization_parameters()
-
             # Training
             for self.__epoch in range(
                 self.__starting_epoch,
@@ -184,13 +179,6 @@ class ModelTrainer:
 
             k_folds_losses.append(deepcopy(epochs_losses))
 
-    def __compute_image_normalization_parameters(self):
-        images, _, _ = next(iter(self.__train_data_loader))
-        # shape of images = [b,c,w,h]
-        self.__training_image_mean, self.__training_image_std = images.mean(
-            [0, 2, 3]
-        ), images.std([0, 2, 3])
-
     def __train(self) -> list[float]:
         """
         Train model weights and track performance
@@ -202,10 +190,6 @@ class ModelTrainer:
         """
         batches_losses = []
 
-        transform = transforms.Normalize(
-            self.__training_image_mean, 255 * self.__training_image_std
-        )
-
         # Turn on training mode to enable gradient computation
         self.__model.train()
 
@@ -216,10 +200,6 @@ class ModelTrainer:
             image = image.to(self.__device, dtype=torch.float)
             metadata = metadata.to(self.__device, dtype=torch.float)
             temperature = temperature.to(self.__device)
-
-            # Normalize the image if necessary
-            if self.__normalize_images:
-                image = transform(image)
 
             # Set gradient to zero to prevent gradient accumulation
             self.__optimizer.zero_grad()
