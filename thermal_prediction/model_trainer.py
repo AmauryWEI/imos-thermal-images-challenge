@@ -63,7 +63,8 @@ class ModelTrainer:
 
         # Split into training and validation dataset
         self.__k_folds_datasets = []
-        if k_folds == 0:
+        if k_folds < 2:
+            print("ModelTrainer: k_folds < 2 => single 80/20 training/validation ratio")
             # Default training to validation ratio: 80% to 20%
             self.__k_folds_datasets = [
                 tuple(self.__split_dataset(dataset, (0.8, 0.2), randomize=True))
