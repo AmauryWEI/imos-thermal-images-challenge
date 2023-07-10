@@ -24,9 +24,10 @@ from resnet_models import (
     ResNet18_RgbNoMetadata,
 )
 from cnn_models import CnnModel
+from mlp_models import MlpModel
 from model_trainer import ModelTrainer, parameters_count
 
-GRAYSCALE_MODELS = ["SampleModel", "CnnModel"]
+GRAYSCALE_MODELS = ["SampleModel", "CnnModel", "MlpModel"]
 RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp", "ResNet18"]
 
 # Define the arguments/options of the script
@@ -98,6 +99,8 @@ def model_from_name(model_name: str) -> Module:
         return SampleModel()
     if model_name == "CnnModel":
         return CnnModel()
+    if model_name == "MlpModel":
+        return MlpModel()
     elif model_name == "ResNet50":
         return ResNet50_RgbNoMetadata()
     elif model_name == "ResNet50Metadata":
