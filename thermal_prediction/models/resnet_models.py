@@ -27,6 +27,7 @@ class ResNet50_RgbNoMetadata(Module):
         for param in self.__resnet.layer4.parameters():
             param.requires_grad = True
 
+        # Image pre-processing layer (resize, center cropping, ImageNet normalization)
         self.__resnet_preprocess = ResNet50_Weights.DEFAULT.transforms(antialias=False)
 
         # Modify the last FC layer to output a single value (instead of 1000 classes)
@@ -46,6 +47,11 @@ class ResNet50_RgbMetadata(Module):
     def __init__(self):
         super(ResNet50_RgbMetadata, self).__init__()
 
+        ################################
+        # ResNet50 Network Configuration
+        ################################
+
+        # Import a pre-trained ResNet50 network
         self.__resnet = resnet50(weights=ResNet50_Weights.DEFAULT)
 
         # Do not fine-tune the ResNet50 weights
@@ -56,11 +62,20 @@ class ResNet50_RgbMetadata(Module):
         for param in self.__resnet.layer4.parameters():
             param.requires_grad = True
 
+        # Image pre-processing layer (resize, center cropping, ImageNet normalization)
         self.__resnet_preprocess = ResNet50_Weights.DEFAULT.transforms(antialias=False)
 
-        # Multi-Layer Perceptron to process the MetaData
+        #################################
+        # Metadata Multi-Layer Perceptron
+        #################################
+
+        # Multi-Layer Perceptron to process the metadata
         self.__mlp_output_size = 9
         self.__mlp = Linear(9, self.__mlp_output_size)
+
+        ######################
+        # Final Network Output
+        ######################
 
         # The output of ResNet50 is 1000
         self.__fc = Linear(1000 + self.__mlp_output_size, 1)
