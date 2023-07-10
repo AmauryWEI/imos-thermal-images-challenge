@@ -4,7 +4,7 @@
 
 from torch import Tensor, tanh, cat
 from torch.nn import Module, Linear, Identity
-from torchvision.models import resnet50, ResNet50_Weights
+from torchvision.models import resnet50, ResNet50_Weights, resnet18, ResNet18_Weights
 
 
 class ResNet50_RgbNoMetadata(Module):
@@ -148,3 +148,34 @@ class ResNet50_RgbMetadataMlp(Module):
         out = self.__fc(out)
 
         return out
+
+
+class ResNet18_RgbNoMetadata(Module):
+    """
+    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 9 x 1) (not used)
+    Output: Temperature (float)
+    """
+
+    def __init__(self):
+        super(ResNet18_RgbNoMetadata, self).__init__()
+
+        # Load a pre-trained ResNet50 network
+        self.__resnet = resnet18(weights=ResNet18_Weights.DEFAULT)
+
+        # Disable FineTuning on the complete model
+        for param in self.__resnet.parameters():
+            param.requires_grad = False
+
+        # FineTune only the last ResNet layer
+        for param in self.__resnet.layer4.parameters():
+            param.requires_grad = True
+
+        # Image pre-processing layer (resize, center cropping, ImageNet normalization)
+        self.__resnet_preprocess = ResNet18_Weights.DEFAULT.transforms(antialias=False)
+
+        # Modify the last FC layer to output a single value (instead of 1000 classes)
+        self.__resnet.fc = Linear(512, 1)
+
+    def forward(self, image: Tensor, metadata: Tensor):
+        # ResNet forward
+        return self.__resnet.forward(self.__resnet_preprocess(image))
