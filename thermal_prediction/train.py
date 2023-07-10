@@ -148,7 +148,7 @@ def train(
         epochs_count=epochs_count,
         batch_size=batch_size,
         learning_rate=learning_rate,
-        workers_count=1,
+        workers_count=4,
         k_folds=folds,
         device=device,
         load_checkpoint_file=checkpoint,
