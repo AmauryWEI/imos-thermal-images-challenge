@@ -158,25 +158,25 @@ def main(args: argparse.Namespace) -> int:
     # Convert potentially relative path to absolute path
     metadata_abs_path = path.abspath(args.metadata_file)
     if not args.quiet:
-        print("Metadata file\t: {}".format(metadata_abs_path))
+        print(f"Metadata file\t: {metadata_abs_path}")
     images_dir_abs_path = path.abspath(args.images_dir)
     if not args.quiet:
-        print("Images folder\t: {}\n".format(images_dir_abs_path))
+        print(f"Images folder\t: {images_dir_abs_path}\n")
 
     # Make sure the target CSV file exists
     if not path.exists(metadata_abs_path):
-        print("ERROR: File ", metadata_abs_path, " does not exist.")
+        print(f"ERROR: File {metadata_abs_path} does not exist.")
         return 1
     if not path.isfile(metadata_abs_path):
-        print("ERROR: ", metadata_abs_path, " is a directory.")
+        print(f"ERROR: {metadata_abs_path} is a directory.")
         return 1
 
     # Make sure the images root directory exists
     if not path.exists(images_dir_abs_path):
-        print("ERROR: Folder ", images_dir_abs_path, " does not exist.")
+        print(f"ERROR: Folder {images_dir_abs_path} does not exist.")
         return 1
     if not path.isdir(images_dir_abs_path):
-        print("ERROR: ", images_dir_abs_path, " is not a directory.")
+        print(f"ERROR: {images_dir_abs_path} is not a directory.")
         return 1
 
     # Make sure the model is known
