@@ -3,14 +3,12 @@
 # Description:  ModelTrainer class to train neural networks for Challenge #1
 
 from os import path, makedirs
-from copy import deepcopy
 
 import numpy as np
 from tqdm import tqdm
 import torch
 from torch.optim import Adam
 from torch.nn import Module, MSELoss
-from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader, Subset, ConcatDataset, random_split
 
 
