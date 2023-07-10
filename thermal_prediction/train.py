@@ -158,7 +158,9 @@ def main(args: argparse.Namespace) -> int:
 
     # Make sure the model is known
     if args.model not in GRAYSCALE_MODELS and args.model not in RGB_MODELS:
-        print(f"ERROR: Unknown model {args.model}")
+        print(
+            f"ERROR: Unknown model {args.model}  (known: {GRAYSCALE_MODELS} {RGB_MODELS})"
+        )
         return 1
 
     # Load the dataset
