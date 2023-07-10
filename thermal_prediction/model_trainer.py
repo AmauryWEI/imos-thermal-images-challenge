@@ -218,7 +218,7 @@ class ModelTrainer:
             self.__optimizer.step()
 
             # Store performance metrics and update loss on status bar
-            tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}", refresh=False)
+            tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}")
 
         print(f"Epoch {self.__epoch}: Mean training loss {np.mean(batches_losses):.2f}")
 
@@ -257,7 +257,7 @@ class ModelTrainer:
                 batches_losses.append(loss.item())
 
                 # Store performance metrics and update loss on status bar
-                tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}", refresh=False)
+                tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}")
 
         # Obtain and save mean performance for this round
         print(
