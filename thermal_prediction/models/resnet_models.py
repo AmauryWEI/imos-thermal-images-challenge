@@ -3,7 +3,7 @@
 # Description:  Models based on ResNet pre-trained architectures
 
 from torch import Tensor, relu, cat
-from torch.nn import Module, Linear
+from torch.nn import Module, Linear, Identity
 from torchvision.models import resnet50, ResNet50_Weights
 
 
@@ -65,31 +65,23 @@ class ResNet50_RgbMetadata(Module):
         # Image pre-processing layer (resize, center cropping, ImageNet normalization)
         self.__resnet_preprocess = ResNet50_Weights.DEFAULT.transforms(antialias=False)
 
-        #################################
-        # Metadata Multi-Layer Perceptron
-        #################################
+        # Replace the default ResNet Fully-Connected layer by Identity (to get the raw 2048 values)
+        self.__resnet.fc = Identity()
 
-        # Multi-Layer Perceptron to process the metadata
-        self.__mlp_output_size = 9
-        self.__mlp = Linear(9, self.__mlp_output_size)
+        ##############################
+        # Network Output with Metadata
+        ##############################
 
-        ######################
-        # Final Network Output
-        ######################
-
-        # The output of ResNet50 is 1000
-        self.__fc = Linear(1000 + self.__mlp_output_size, 1)
+        # The output of ResNet50 is 2048 + 9 metadata parameters
+        self.__fc = Linear(2048 + 9, 1)
 
     def forward(self, image: Tensor, metadata: Tensor):
         # ResNet image processing
         image = self.__resnet_preprocess(image)
         resnet_out = self.__resnet.forward(image)
 
-        # MLP metadata processing
-        mlp_out = relu(self.__mlp(metadata))
-
-        # Network Out with ResNet Out and MLP Out (no activation function)
-        out = cat((resnet_out, mlp_out), 1)
+        # Network Out with ResNet Out and metadata
+        out = cat((resnet_out, metadata), 1)
         # No activation function to output a continuous value
         out = self.__fc(out)
 
