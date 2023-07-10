@@ -91,6 +91,36 @@ def show_metadata_distribution(dataset: ThermalDataset) -> None:
     temperature_fig.tight_layout()
 
 
+def show_random_images(dataset: ThermalDataset) -> None:
+    """
+    Show multiple random images of the dataset
+
+    Parameters
+    ----------
+    dataset : ThermalDataset
+        Dataset containing the images
+    """
+    ROWS_COUNT = 3
+    COLS_COUNT = 3
+    images_fig, axes = plt.subplots(nrows=ROWS_COUNT, ncols=COLS_COUNT, figsize=(14, 8))
+    images_fig.canvas.manager.set_window_title("Dataset Images")
+    images_fig.tight_layout()
+
+    for row_idx in range(ROWS_COUNT):
+        for col_idx in range(COLS_COUNT):
+            image_idx = np.random.randint(0, len(dataset))
+            tensor_image, _, temperature = dataset[image_idx]
+
+            # Permute the channels for plotting (in: 3 x H x W ; out: H x W x 3)
+            axes[row_idx, col_idx].imshow(tensor_image.permute(1, 2, 0))
+            # Set image title and turn-off tick labels
+            axes[row_idx, col_idx].set_title(
+                f"Idx: {image_idx} / {temperature[0]:.2f} [°C]", size=10
+            )
+            axes[row_idx, col_idx].set_yticklabels([])
+            axes[row_idx, col_idx].set_xticklabels([])
+
+
 def main(args: argparse.Namespace) -> int:
     # Convert potentially relative path to absolute path
     metadata_abs_path = path.abspath(args.metadata_file)
@@ -126,6 +156,7 @@ def main(args: argparse.Namespace) -> int:
     )
 
     show_metadata_distribution(dataset)
+    show_random_images(dataset)
 
     plt.show()
 
