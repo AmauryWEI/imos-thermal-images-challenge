@@ -7,7 +7,7 @@ from os import path, mkdir
 from tqdm import tqdm
 from numpy import mean
 import torch
-from torch.nn import Module, MSELoss
+from torch.nn import Module, MSELoss, L1Loss
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -37,13 +37,15 @@ class ModelTester:
         self.__batch_size = batch_size
         self.__workers_count = workers_count
 
-        self.__loss_function = MSELoss()
+        self.__mse_loss_function = MSELoss()
+        self.__mae_loss_function = L1Loss()
         self.__save_predictions = save_predictions
 
         # Loaded from the checkpoint file and accessible for plotting
         self.__training_losses = []
         self.__validation_losses = []
-        self.__testing_losses = []
+        self.__testing_mse_losses = []  # Mean Square Error (L2)
+        self.__testing_mae_losses = []  # Mean Absolute Error (L1)
 
         # Ensure the directory to save predictions exists
         if self.__save_predictions:
@@ -92,11 +94,14 @@ class ModelTester:
 
                 predictions.append(output.cpu().detach().numpy())
 
-                loss = self.__loss_function(output, temperature)
-                self.__testing_losses.append(loss.item())
+                mse_loss = self.__mse_loss_function(output, temperature)
+                self.__testing_mse_losses.append(mse_loss.item())
+                mae_loss = self.__mae_loss_function(output, temperature)
+                self.__testing_mae_losses.append(mae_loss.item())
 
             # Print mean performance for this round
-            print(f"ModelTester: Mean loss {mean(self.__testing_losses):.2f}")
+            print(f"ModelTester: Mean MSE loss {mean(self.__testing_mse_losses):.2f}")
+            print(f"ModelTester: Mean MAE loss {mean(self.__testing_mae_losses):.2f}")
 
             # Stack the prediction and save as numpy file
             if self.__save_predictions:
