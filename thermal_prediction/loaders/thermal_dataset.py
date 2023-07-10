@@ -9,6 +9,7 @@ import pandas as pd
 from torch import Tensor
 from torch.utils.data import Dataset
 from torchvision.io import read_image, ImageReadMode
+from torchvision.transforms import Compose, RandomHorizontalFlip, RandomVerticalFlip
 
 
 RAW_METADATA_COLUMNS = [
@@ -58,6 +59,8 @@ class ThermalDataset(Dataset):
         self.__grayscale_to_rgb = grayscale_to_rgb
         self.__normalize = normalize
         self.__quiet = quiet
+
+        self.__rand_flip = Compose([RandomHorizontalFlip(0.5), RandomVerticalFlip(0.5)])
 
         # Load the metadata CSV file
         self.__metadata = pd.read_csv(self.__metadata_abs_path)
@@ -131,9 +134,13 @@ class ThermalDataset(Dataset):
             data_frame_row["Image Number"] + ".jpg",
         )
         if self.__grayscale_to_rgb:
-            return read_image(image_abs_path, ImageReadMode.RGB) / 255.0
+            return self.__rand_flip(
+                read_image(image_abs_path, ImageReadMode.RGB) / 255.0
+            )
         else:
-            return read_image(image_abs_path, ImageReadMode.GRAY) / 255.0
+            return self.__rand_flip(
+                read_image(image_abs_path, ImageReadMode.GRAY) / 255.0
+            )
 
     def __metadata_as_tensor(self, index: int) -> Tensor:
         """
