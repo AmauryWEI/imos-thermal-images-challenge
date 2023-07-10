@@ -21,12 +21,13 @@ from resnet_models import (
     ResNet50_RgbNoMetadata,
     ResNet50_RgbMetadata,
     ResNet50_RgbMetadataMlp,
+    ResNet18_RgbNoMetadata,
 )
 from cnn_models import CnnModel
 from model_trainer import ModelTrainer, parameters_count
 
 GRAYSCALE_MODELS = ["SampleModel", "CnnModel"]
-RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp"]
+RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp", "ResNet18"]
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -103,6 +104,8 @@ def model_from_name(model_name: str) -> Module:
         return ResNet50_RgbMetadata()
     elif model_name == "ResNet50MetadataMlp":
         return ResNet50_RgbMetadataMlp()
+    elif model_name == "ResNet18":
+        return ResNet18_RgbNoMetadata()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
