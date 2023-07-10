@@ -40,9 +40,6 @@ class ModelTrainer:
         self.__model = model.to(device)
         self.__device = device
 
-        self.__training_image_mean = 0
-        self.__training_image_std = 1
-
         self.__starting_epoch = 0
         self.__epochs_count = epochs_count
         self.__batch_size = batch_size
@@ -285,8 +282,6 @@ class ModelTrainer:
                 "training_losses": training_losses,
                 "validation_loss_mean": np.mean(validation_losses),
                 "validation_losses": validation_losses,
-                "training_image_mean": self.__training_image_mean,
-                "training_image_std": self.__training_image_std,
             },
             target_checkpoint_path,
         )
