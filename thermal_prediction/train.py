@@ -17,12 +17,16 @@ from thermal_dataset import ThermalDataset
 
 sys.path.append("./models/")
 from sample_model import SampleModel
-from resnet_models import ResNet50_RgbNoMetadata, ResNet50_RgbMetadata
+from resnet_models import (
+    ResNet50_RgbNoMetadata,
+    ResNet50_RgbMetadata,
+    ResNet50_RgbMetadataMlp,
+)
 from cnn_models import CnnModel
 from model_trainer import ModelTrainer, parameters_count
 
 GRAYSCALE_MODELS = ["SampleModel", "CnnModel"]
-RGB_MODELS = ["ResNet50NoMetadata", "ResNet50"]
+RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp"]
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -93,10 +97,12 @@ def model_from_name(model_name: str) -> Module:
         return SampleModel()
     if model_name == "CnnModel":
         return CnnModel()
-    elif model_name == "ResNet50NoMetadata":
-        return ResNet50_RgbNoMetadata()
     elif model_name == "ResNet50":
+        return ResNet50_RgbNoMetadata()
+    elif model_name == "ResNet50Metadata":
         return ResNet50_RgbMetadata()
+    elif model_name == "ResNet50MetadataMlp":
+        return ResNet50_RgbMetadataMlp()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
