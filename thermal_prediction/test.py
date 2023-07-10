@@ -11,6 +11,7 @@ from os import path
 
 import torch
 from torch.nn import Module
+from torch.utils.data import Dataset
 
 sys.path.append("./loaders/")
 from thermal_dataset import ThermalDataset
@@ -26,6 +27,7 @@ from resnet_models import (
 from cnn_models import CnnModel
 from mlp_models import MlpModel, MlpModelDateTime
 from model_trainer import parameters_count
+from model_tester import ModelTester
 
 GRAYSCALE_MODELS = ["SampleModel", "CnnModel", "MlpModel", "MlpModelDateTime"]
 RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp", "ResNet18"]
@@ -80,6 +82,8 @@ parser.add_argument(
     default=32,
 )
 
+parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=False)
+
 
 def requires_rgb(model: str) -> None:
     return True if model in RGB_MODELS else False
@@ -104,6 +108,28 @@ def model_from_name(model_name: str) -> Module:
         return ResNet18_RgbNoMetadata()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
+
+
+def test(
+    dataset: Dataset,
+    model: Module,
+    batch_size: int,
+    device: torch.device,
+    checkpoint: str,
+    model_name: str,
+    save_predictions: bool,
+) -> None:
+    model_tester = ModelTester(
+        model=model,
+        dataset=dataset,
+        batch_size=batch_size,
+        workers_count=1,
+        load_checkpoint_file=checkpoint,
+        save_predictions=save_predictions,
+        device=device,
+        model_name=model_name,
+    )
+    model_tester.run()
 
 
 def main(args: argparse.Namespace) -> int:
@@ -163,6 +189,17 @@ def main(args: argparse.Namespace) -> int:
         total_params, _ = parameters_count(model)
         print(f"\nModel: {args.model} (Parameters: {total_params})")
         print(model)
+
+    # Test the model
+    test(
+        dataset,
+        model,
+        batch_size=args.batch,
+        device=device,
+        checkpoint=args.checkpoint,
+        model_name=args.model,
+        save_predictions=args.save,
+    )
 
     return 0
 
