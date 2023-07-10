@@ -64,6 +64,9 @@ def plot_histogram(
     ax.stairs(hist, bins, fill=True)
     ax.set_xlabel(f"{column_name} [{unit}]")
     ax.set_ylabel("Probability")
+    ax.set_title(
+        f"Min: {min_value:.2f} / Max: {max_value:.2f} / Mean: {mean_value:.2f}"
+    )
 
 
 def show_metadata_distribution(dataset: ThermalDataset) -> None:
