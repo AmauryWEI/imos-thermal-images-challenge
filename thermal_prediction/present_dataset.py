@@ -89,7 +89,6 @@ def show_metadata_distribution(dataset: ThermalDataset) -> None:
 
     metadata_fig.tight_layout()
     temperature_fig.tight_layout()
-    plt.show()
 
 
 def main(args: argparse.Namespace) -> int:
@@ -126,6 +125,8 @@ def main(args: argparse.Namespace) -> int:
     )
 
     show_metadata_distribution(dataset)
+
+    plt.show()
 
     return 0
 
