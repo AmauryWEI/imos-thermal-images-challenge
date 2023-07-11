@@ -30,6 +30,7 @@ from mlp_models import MlpModel, MlpModelDateTime
 from mobilenet_models import (
     MobileNetV3Small_RgbNoMetadata,
     MobileNetV3Small_RgbMetadata,
+    MobileNetV3Small_RgbMetadataMlp,
 )
 from model_trainer import ModelTrainer, parameters_count
 
@@ -43,6 +44,7 @@ RGB_MODELS = [
     "ResNet18MetadataMlp",
     "MobileNetV3Small",
     "MobileNetV3SmallMetadata",
+    "MobileNetV3SmallMetadataMlp",
 ]
 
 # Define the arguments/options of the script
@@ -150,6 +152,8 @@ def model_from_name(model_name: str) -> Module:
         return MobileNetV3Small_RgbNoMetadata()
     elif model_name == "MobileNetV3SmallMetadata":
         return MobileNetV3Small_RgbMetadata()
+    elif model_name == "MobileNetV3SmallMetadataMlp":
+        return MobileNetV3Small_RgbMetadataMlp()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
