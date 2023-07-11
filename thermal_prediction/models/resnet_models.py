@@ -9,8 +9,18 @@ from torchvision.models import resnet50, ResNet50_Weights, resnet18, ResNet18_We
 
 class ResNet50_RgbNoMetadata(Module):
     """
-    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 9 x 1) (not used)
-    Output: Temperature (float)
+    Model based on a pre-trained ResNet50 architecture, using only an RGB input image
+    (the metadata is not used).
+
+    The complete ResNet50 model is frozen, except for the last convolution block. The
+    last ResNet50 linear layer (2048 -> 1000) is replaced by a trainable linear layer
+    (2048 -> 1) to output a unique continuous value (= temperature).
+
+    Inputs:
+        - RGB Image (channels: 3 ; cols: 384 ; rows: 288) (Tensor 3 x 224 x 224)
+        - Metadata (Tensor 9 x 1) (not used)
+    Output:
+        - Temperature (float)
     """
 
     def __init__(self):
