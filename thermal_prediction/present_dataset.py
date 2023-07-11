@@ -59,7 +59,7 @@ def plot_histogram(
     hist, bins = np.histogram(
         dataset.metadata[column_name],
         bins=bins_count,
-        # density=True,
+        density=True,
     )
     ax.stairs(hist, bins, fill=True)
     ax.set_xlabel(f"{column_name} [{unit}]")
