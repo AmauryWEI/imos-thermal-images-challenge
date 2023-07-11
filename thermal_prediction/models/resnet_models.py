@@ -185,8 +185,18 @@ class ResNet50_RgbMetadataMlp(Module):
 
 class ResNet18_RgbNoMetadata(Module):
     """
-    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 9 x 1) (not used)
-    Output: Temperature (float)
+    Model based on a pre-trained ResNet18 architecture, using only an RGB input image
+    (the metadata is not used).
+
+    The complete ResNet18 model is frozen, except for the last convolution block. The
+    last ResNet18 linear layer (512 -> 1000) is replaced by a trainable linear layer
+    (512 -> 1) to output a unique continuous value (= temperature).
+
+    Inputs:
+        - RGB Image (channels: 3 ; cols: 384 ; rows: 288) (Tensor 3 x 224 x 224)
+        - Metadata (Tensor 9 x 1) (not used)
+    Output:
+        - Temperature (float)
     """
 
     def __init__(self):
@@ -216,8 +226,19 @@ class ResNet18_RgbNoMetadata(Module):
 
 class ResNet18_RgbMetadata(Module):
     """
-    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 9 x 1)
-    Output: Temperature (float)
+    Model based on a pre-trained ResNet18 architecture, using an RGB input image and its
+    complete metadata.
+
+    The complete ResNet18 model is frozen, except for the last convolution block. The
+    last ResNet50 linear layer (512 -> 1000) is removed. The 512 ResNet18 output are
+    concatenated with the metada (9) and pass through a linear layer (521 -> 1) to
+    output a unique continuous value (= temperature).
+
+    Inputs:
+        - RGB Image (channels: 3 ; cols: 384 ; rows: 288) (Tensor 3 x 224 x 224)
+        - Metadata (Tensor 9 x 1)
+    Output:
+        - Temperature (float)
     """
 
     def __init__(self):
@@ -266,8 +287,20 @@ class ResNet18_RgbMetadata(Module):
 
 class ResNet18_RgbMetadataMlp(Module):
     """
-    Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 9 x 1)
-    Output: Temperature (float)
+    Model based on a pre-trained ResNet18 architecture, using an RGB input image and its
+    complete metadata.
+
+    The complete ResNet18 model is frozen, except for the last convolution block. The
+    last ResNet50 linear layer (512 -> 1000) is removed. The metadata tensor (9) is
+    first processed by a linear layer (9 -> 9), and the resulting output concatenated
+    with the ResNet50 output (512). Finally, this tensor passes through a linear layer
+    (521 -> 1) to output a unique continuous value (= temperature).
+
+    Inputs:
+        - RGB Image (channels: 3 ; cols: 384 ; rows: 288) (Tensor 3 x 224 x 224)
+        - Metadata (Tensor 9 x 1)
+    Output:
+        - Temperature (float)
     """
 
     def __init__(self):
