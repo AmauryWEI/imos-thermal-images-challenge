@@ -9,9 +9,11 @@ import argparse
 import sys
 from os import path
 
+import numpy as np
 import torch
 from torch.nn import Module
 from torch.utils.data import Dataset
+import matplotlib.pyplot as plt
 
 sys.path.append("./loaders/")
 from thermal_dataset import ThermalDataset
@@ -85,6 +87,65 @@ parser.add_argument(
 parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=False)
 
 
+def plot_losses(model_tester: ModelTester, model_name: str) -> None:
+    losses_fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(14, 8))
+    losses_fig.canvas.manager.set_window_title(
+        f"{model_name} - Training & Validation Losses"
+    )
+
+    training_losses = np.array(model_tester.training_losses)
+    mean_training_loss_per_epoch = np.mean(training_losses, axis=1)
+    validation_losses = np.array(model_tester.validation_losses)
+    mean_validation_loss_per_epoch = np.mean(validation_losses, axis=1)
+    max_loss = max(np.amax(training_losses), np.amax(validation_losses))
+
+    textbox_contents = "\n".join(
+        (
+            f"Last Training MSE Loss    = {mean_training_loss_per_epoch[-1]:.2f}",
+            f"Last Validation MSE Loss = {mean_validation_loss_per_epoch[-1]:.2f}",
+        )
+    )
+    props = dict(boxstyle="round", facecolor="white", alpha=0.5)
+    # Place a text box in bottom left in axes coords
+    ax.text(
+        0.02,
+        0.1,
+        textbox_contents,
+        transform=ax.transAxes,
+        fontsize=10,
+        verticalalignment="top",
+        bbox=props,
+    )
+
+    # Plot the mean losses
+    ax.plot(mean_training_loss_per_epoch, label="Training", color="C0")
+    ax.plot(mean_validation_loss_per_epoch, label="Validation", color="C1")
+
+    # Plot the batch losses
+    ax2 = ax.twiny()
+    ax2.plot(training_losses.flatten(), label="Training", alpha=0.25, color="C0")
+    ax3 = ax.twiny()
+    ax3.plot(validation_losses.flatten(), label="Validation", alpha=0.25, color="C1")
+
+    # Format the plot
+    ax.legend()
+    ax.set_ylim([0, max_loss + 1])
+    ax.set_xlim([0, len(mean_training_loss_per_epoch) - 1])
+    ax2.set_ylim([0, max_loss + 1])
+    ax3.set_ylim([0, max_loss + 1])
+    ax2.set_xlim([0, len(training_losses.flatten()) - 1])
+    ax3.set_xlim([0, len(validation_losses.flatten()) - 1])
+    ax2.set_xticklabels([])
+    ax3.set_xticklabels([])
+    ax.grid(visible=True)
+    ax.set_xlabel("Epoch [u]")
+    ax.set_ylabel("MSE Loss [°C^2]")
+    ax.set_title(f"{model_name} - Training & Validation Losses")
+    losses_fig.tight_layout()
+
+    plt.show(block=True)
+
+
 def requires_rgb(model: str) -> None:
     return True if model in RGB_MODELS else False
 
@@ -129,6 +190,7 @@ def test(
         device=device,
         model_name=model_name,
     )
+    plot_losses(model_tester, model_name)
     model_tester.run()
 
 
