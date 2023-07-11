@@ -159,7 +159,7 @@ class ResNet18_RgbNoMetadata(Module):
     def __init__(self):
         super(ResNet18_RgbNoMetadata, self).__init__()
 
-        # Load a pre-trained ResNet50 network
+        # Load a pre-trained ResNet18 network
         self.__resnet = resnet18(weights=ResNet18_Weights.DEFAULT)
 
         # Disable FineTuning on the complete model
