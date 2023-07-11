@@ -104,7 +104,6 @@ def show_random_images(dataset: ThermalDataset) -> None:
     COLS_COUNT = 3
     images_fig, axes = plt.subplots(nrows=ROWS_COUNT, ncols=COLS_COUNT, figsize=(14, 8))
     images_fig.canvas.manager.set_window_title("Dataset Images")
-    images_fig.tight_layout()
 
     for row_idx in range(ROWS_COUNT):
         for col_idx in range(COLS_COUNT):
@@ -119,6 +118,8 @@ def show_random_images(dataset: ThermalDataset) -> None:
             )
             axes[row_idx, col_idx].set_yticklabels([])
             axes[row_idx, col_idx].set_xticklabels([])
+
+    images_fig.tight_layout()
 
 
 def main(args: argparse.Namespace) -> int:
