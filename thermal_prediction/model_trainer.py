@@ -8,13 +8,11 @@ import numpy as np
 from tqdm import tqdm
 import torch
 from torch.optim import Adam
-from torch.nn import Module, MSELoss
-from torchvision import transforms
+from torch.nn import Module, MSELoss, L1Loss
 from torch.utils.data import Dataset, DataLoader, Subset, ConcatDataset, random_split
 
 
 class ModelTrainer:
-
     """
     A training worker for neural network models.
 
@@ -31,7 +29,6 @@ class ModelTrainer:
         learning_rate: int,
         workers_count: int,
         k_folds: int,
-        normalize_images: bool = True,
         device: torch.device = torch.device("cpu"),
         load_checkpoint_file: str = "",
         model_name: str = "model",
@@ -40,16 +37,13 @@ class ModelTrainer:
         self.__model = model.to(device)
         self.__device = device
 
-        self.__normalize_images = normalize_images
-        self.__training_image_mean = 0
-        self.__training_image_std = 1
-
         self.__starting_epoch = 0
         self.__epochs_count = epochs_count
         self.__batch_size = batch_size
         self.__workers_count = workers_count
 
         self.__loss_function = MSELoss()
+        self.__mae_loss_function = L1Loss()
         self.__optimizer = Adam(model.parameters(), lr=learning_rate)
 
         self.__fold = 0
@@ -57,14 +51,19 @@ class ModelTrainer:
         self.__train_data_loader = None
         self.__validation_data_loader = None
 
-        self.__model_name = model_name
+        # Stored globally to keep track of all losses in each checkpoint
+        self.__training_losses = []
+        self.__validation_losses = []
+
+        self.__model_name = model_name  # Checkpoints will be saved with this name
         self.__checkpoints_dir = path.abspath(checkpoints_dir)
         if not path.exists(self.__checkpoints_dir):
             makedirs(self.__checkpoints_dir)
 
         # Split into training and validation dataset
         self.__k_folds_datasets = []
-        if k_folds == 0:
+        if k_folds < 2:
+            print("ModelTrainer: k_folds < 2 => single 80/20 training/validation ratio")
             # Default training to validation ratio: 80% to 20%
             self.__k_folds_datasets = [
                 tuple(self.__split_dataset(dataset, (0.8, 0.2), randomize=True))
@@ -76,7 +75,7 @@ class ModelTrainer:
 
         # Just before starting, load a checkpoint file if available
         if len(load_checkpoint_file) > 0:
-            self.__load_checkpoint(self.__load_checkpoint_file)
+            self.__load_checkpoint(load_checkpoint_file)
 
     def __split_dataset(
         self,
@@ -139,13 +138,10 @@ class ModelTrainer:
         """
         Main entry point to start training
         """
-        k_folds_losses = []
-
         for self.__fold, (train_data, validation_data) in enumerate(
             self.__k_folds_datasets
         ):
-            epochs_losses = []
-            print(f"Fold {self.__fold}:")
+            print(f"ModelTrainer: Fold {self.__fold}:")
 
             # Prepare validation data
             self.__validation_data_loader = DataLoader(
@@ -160,9 +156,6 @@ class ModelTrainer:
                 batch_size=self.__batch_size,
                 num_workers=self.__workers_count,
             )
-            if self.__normalize_images:
-                self.__compute_image_normalization_parameters()
-
             # Training
             for self.__epoch in range(
                 self.__starting_epoch,
@@ -177,16 +170,14 @@ class ModelTrainer:
                 )
 
                 training_losses = self.__train()
-                epochs_losses.append(training_losses)
                 validation_losses = self.__validate()
-                self.__save_checkpoint(training_losses, validation_losses)
 
-    def __compute_image_normalization_parameters(self):
-        images, _, _ = next(iter(self.__train_data_loader))
-        # shape of images = [b,c,w,h]
-        self.__training_image_mean, self.__training_image_std = images.mean(
-            [0, 2, 3]
-        ), images.std([0, 2, 3])
+                # Update the history of training & validation losses for this fold
+                self.__training_losses.append(training_losses)
+                self.__validation_losses.append(validation_losses)
+
+                # Save the checkpoint (including training & validation losses)
+                self.__save_checkpoint()
 
     def __train(self) -> list[float]:
         """
@@ -199,10 +190,6 @@ class ModelTrainer:
         """
         batches_losses = []
 
-        transform = transforms.Normalize(
-            self.__training_image_mean, self.__training_image_std
-        )
-
         # Turn on training mode to enable gradient computation
         self.__model.train()
 
@@ -213,10 +200,6 @@ class ModelTrainer:
             image = image.to(self.__device, dtype=torch.float)
             metadata = metadata.to(self.__device, dtype=torch.float)
             temperature = temperature.to(self.__device)
-
-            # Normalize the image if necessary
-            if self.__normalize_images:
-                image = transform(image)
 
             # Set gradient to zero to prevent gradient accumulation
             self.__optimizer.zero_grad()
@@ -235,9 +218,11 @@ class ModelTrainer:
             self.__optimizer.step()
 
             # Store performance metrics and update loss on status bar
-            tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}", refresh=False)
+            tqdm_iterator.set_postfix_str(f"MSE Loss: {loss.item():.3e}")
 
-        print(f"Epoch {self.__epoch}: Mean training loss {np.mean(batches_losses):.2f}")
+        print(
+            f"Epoch {self.__epoch}: Mean training MSE Loss {np.mean(batches_losses):.4f}"
+        )
 
         return batches_losses
 
@@ -251,6 +236,7 @@ class ModelTrainer:
             Loss of each batch during this validation stage
         """
         batches_losses = []
+        batches_mae_losses = []
 
         # Evaluation mode. Disable running mean and variance of batch normalization
         self.__model.eval()
@@ -269,25 +255,24 @@ class ModelTrainer:
                 # Inference prediction by model and obtain loss
                 output = self.__model(image, metadata)
                 loss = self.__loss_function(output, temperature)
+                mae_loss = self.__mae_loss_function(output, temperature)
 
                 # Keep track of the loss
                 batches_losses.append(loss.item())
+                batches_mae_losses.append(mae_loss.item())
 
                 # Store performance metrics and update loss on status bar
-                tqdm_iterator.set_postfix_str(f"Loss: {loss.item():.3e}", refresh=False)
+                tqdm_iterator.set_postfix_str(f"MSE Loss: {loss.item():.3e}")
 
-        # Obtain and save mean performance for this round
+        # Print mean performance for this epoch
         print(
-            f"Epoch {self.__epoch}: Mean validation loss {np.mean(batches_losses):.2f}"
+            f"Epoch {self.__epoch}: Mean validation MSE Loss: {np.mean(batches_losses):.4f} "
+            f"(MAE Loss: {np.mean(batches_mae_losses):.4f})"
         )
 
         return batches_losses
 
-    def __save_checkpoint(
-        self,
-        training_losses: list[float],
-        validation_losses: list[float],
-    ) -> None:
+    def __save_checkpoint(self) -> None:
         target_checkpoint_path = path.join(
             self.__checkpoints_dir,
             f"{self.__model_name}_fold-{self.__fold}_epoch-{self.__epoch}.pt",
@@ -297,19 +282,16 @@ class ModelTrainer:
                 "epoch": self.__epoch,
                 "model_state_dict": self.__model.state_dict(),
                 "optimizer_state_dict": self.__optimizer.state_dict(),
-                "training_loss_mean": np.mean(training_losses),
-                "training_losses": training_losses,
-                "validation_loss_mean": np.mean(validation_losses),
-                "validation_losses": validation_losses,
-                "training_image_mean": self.__training_image_mean,
-                "training_image_std": self.__training_image_std,
+                "last_training_loss_mean": np.mean(self.__training_losses[-1]),
+                "training_losses": self.__training_losses,
+                "last_validation_loss_mean": np.mean(self.__validation_losses[-1]),
+                "validation_losses": self.__validation_losses,
             },
             target_checkpoint_path,
         )
 
     def __load_checkpoint(self, checkpoint_file_path: str) -> None:
-        if not self.__quiet:
-            print(f"ModelTrainer: loading checkpoint {checkpoint_file_path}")
+        print(f"ModelTrainer: loading checkpoint {checkpoint_file_path}")
 
         # Make sure the target checkpoint file exists
         if not path.exists(checkpoint_file_path):
@@ -321,6 +303,8 @@ class ModelTrainer:
         self.__starting_epoch = checkpoint["epoch"] + 1
         self.__model.load_state_dict(checkpoint["model_state_dict"])
         self.__optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        self.__training_losses = checkpoint["training_losses"]
+        self.__validation_losses = checkpoint["validation_losses"]
 
 
 def parameters_count(model: Module) -> tuple[int, int]:

@@ -64,6 +64,9 @@ def plot_histogram(
     ax.stairs(hist, bins, fill=True)
     ax.set_xlabel(f"{column_name} [{unit}]")
     ax.set_ylabel("Probability")
+    ax.set_title(
+        f"Min: {min_value:.2f} / Max: {max_value:.2f} / Mean: {mean_value:.2f}"
+    )
 
 
 def show_metadata_distribution(dataset: ThermalDataset) -> None:
@@ -86,7 +89,36 @@ def show_metadata_distribution(dataset: ThermalDataset) -> None:
 
     metadata_fig.tight_layout()
     temperature_fig.tight_layout()
-    plt.show()
+
+
+def show_random_images(dataset: ThermalDataset) -> None:
+    """
+    Show multiple random images of the dataset
+
+    Parameters
+    ----------
+    dataset : ThermalDataset
+        Dataset containing the images
+    """
+    ROWS_COUNT = 3
+    COLS_COUNT = 3
+    images_fig, axes = plt.subplots(nrows=ROWS_COUNT, ncols=COLS_COUNT, figsize=(14, 8))
+    images_fig.canvas.manager.set_window_title("Dataset Images")
+    images_fig.tight_layout()
+
+    for row_idx in range(ROWS_COUNT):
+        for col_idx in range(COLS_COUNT):
+            image_idx = np.random.randint(0, len(dataset))
+            tensor_image, _, temperature = dataset[image_idx]
+
+            # Permute the channels for plotting (in: 3 x H x W ; out: H x W x 3)
+            axes[row_idx, col_idx].imshow(tensor_image.permute(1, 2, 0))
+            # Set image title and turn-off tick labels
+            axes[row_idx, col_idx].set_title(
+                f"Idx: {image_idx} / {temperature[0]:.2f} [°C]", size=10
+            )
+            axes[row_idx, col_idx].set_yticklabels([])
+            axes[row_idx, col_idx].set_xticklabels([])
 
 
 def main(args: argparse.Namespace) -> int:
@@ -118,11 +150,15 @@ def main(args: argparse.Namespace) -> int:
     dataset = ThermalDataset(
         metadata_abs_path,
         images_abs_path=images_dir_abs_path,
+        grayscale_to_rgb=True,
         normalize=False,
         augment=False,
     )
 
     show_metadata_distribution(dataset)
+    show_random_images(dataset)
+
+    plt.show()
 
     return 0
 

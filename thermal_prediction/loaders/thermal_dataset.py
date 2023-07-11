@@ -8,7 +8,13 @@ from datetime import datetime
 import pandas as pd
 from torch import Tensor
 from torch.utils.data import Dataset
-from torchvision.io import read_image
+from torchvision.io import read_image, ImageReadMode
+from torchvision.transforms import (
+    Compose,
+    RandomHorizontalFlip,
+    RandomVerticalFlip,
+    Resize,
+)
 
 
 RAW_METADATA_COLUMNS = [
@@ -32,6 +38,7 @@ class ThermalDataset(Dataset):
         self,
         metadata_abs_path: str,
         images_abs_path: str,
+        grayscale_to_rgb: bool = False,
         normalize: bool = True,
         augment: bool = False,
         quiet: bool = False,
@@ -54,8 +61,12 @@ class ThermalDataset(Dataset):
         """
         self.__metadata_abs_path = metadata_abs_path
         self.__images_abs_path = images_abs_path
+        self.__grayscale_to_rgb = grayscale_to_rgb
         self.__normalize = normalize
         self.__quiet = quiet
+
+        self.__rand_flip = Compose([RandomHorizontalFlip(0.5), RandomVerticalFlip(0.5)])
+        self.__rgb_resize = Resize(224, antialias=True)  # 224 x 224 for ResNet50
 
         # Load the metadata CSV file
         self.__metadata = pd.read_csv(self.__metadata_abs_path)
@@ -109,7 +120,7 @@ class ThermalDataset(Dataset):
 
     def __fetch_image_as_tensor(self, index: int) -> Tensor:
         """
-        Fetch a dataset image as a Tensor with index
+        Fetch a dataset image as a Tensor with index normalized between [0.0 - 1.0]
 
         Parameters
         ----------
@@ -128,9 +139,14 @@ class ThermalDataset(Dataset):
             data_frame_row["Clip Name"],
             data_frame_row["Image Number"] + ".jpg",
         )
-        image = read_image(image_abs_path)
-
-        return image
+        if self.__grayscale_to_rgb:
+            return self.__rgb_resize(
+                self.__rand_flip(read_image(image_abs_path, ImageReadMode.RGB) / 255.0)
+            )
+        else:
+            return self.__rand_flip(
+                read_image(image_abs_path, ImageReadMode.GRAY) / 255.0
+            )
 
     def __metadata_as_tensor(self, index: int) -> Tensor:
         """

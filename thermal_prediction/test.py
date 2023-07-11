@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
-# File:         train.py
-# Date:         2023/07/08
-# Description:  Top-level script to train a Neural Network for the Challenge #1
+# File:         test.py
+# Date:         2023/07/11
+# Description:  Top-level script to test a Neural Network for the Challenge #1
+
 
 import argparse
 import sys
@@ -22,22 +23,14 @@ from resnet_models import (
     ResNet50_RgbMetadata,
     ResNet50_RgbMetadataMlp,
     ResNet18_RgbNoMetadata,
-    ResNet18_RgbMetadata,
-    ResNet18_RgbMetadataMlp,
 )
 from cnn_models import CnnModel
 from mlp_models import MlpModel, MlpModelDateTime
-from model_trainer import ModelTrainer, parameters_count
+from model_trainer import parameters_count
+from model_tester import ModelTester
 
 GRAYSCALE_MODELS = ["SampleModel", "CnnModel", "MlpModel", "MlpModelDateTime"]
-RGB_MODELS = [
-    "ResNet50",
-    "ResNet50Metadata",
-    "ResNet50MetadataMlp",
-    "ResNet18",
-    "ResNet18Metadata",
-    "ResNet18MetadataMlp",
-]
+RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp", "ResNet18"]
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -54,6 +47,13 @@ parser.add_argument(
     "images_dir",
     metavar="Image_Dataset path",
     help="Path to the root directory containing all the images folders",
+    type=str,
+)
+
+parser.add_argument(
+    "checkpoint",
+    metavar="checkpoint_file",
+    help="Model checkpoint to load for testing",
     type=str,
 )
 
@@ -75,14 +75,6 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-e",
-    "--epochs",
-    help="Number of epochs during training",
-    type=int,
-    default=10,
-)
-
-parser.add_argument(
     "-b",
     "--batch",
     help="Batch size",
@@ -90,29 +82,7 @@ parser.add_argument(
     default=32,
 )
 
-parser.add_argument(
-    "-f",
-    "--folds",
-    help="K-folds cross-validation",
-    type=int,
-    default=0,
-)
-
-parser.add_argument(
-    "-c",
-    "--checkpoint",
-    help="Initial model checkpoint to load before training",
-    type=str,
-    default="",
-)
-
-parser.add_argument(
-    "-lr",
-    "--learning_rate",
-    help="Learning rate (for Adam optimizer)",
-    type=float,
-    default=1e-4,
-)
+parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=False)
 
 
 def requires_rgb(model: str) -> None:
@@ -136,38 +106,30 @@ def model_from_name(model_name: str) -> Module:
         return ResNet50_RgbMetadataMlp()
     elif model_name == "ResNet18":
         return ResNet18_RgbNoMetadata()
-    elif model_name == "ResNet18Metadata":
-        return ResNet18_RgbMetadata()
-    elif model_name == "ResNet18MetadataMlp":
-        return ResNet18_RgbMetadataMlp()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
 
-def train(
+def test(
     dataset: Dataset,
     model: Module,
-    epochs_count: int,
     batch_size: int,
-    learning_rate: float,
-    folds: int,
     device: torch.device,
     checkpoint: str,
     model_name: str,
+    save_predictions: bool,
 ) -> None:
-    model_trainer = ModelTrainer(
+    model_tester = ModelTester(
         model=model,
         dataset=dataset,
-        epochs_count=epochs_count,
         batch_size=batch_size,
-        learning_rate=learning_rate,
         workers_count=4,
-        k_folds=folds,
-        device=device,
         load_checkpoint_file=checkpoint,
+        save_predictions=save_predictions,
+        device=device,
         model_name=model_name,
     )
-    model_trainer.run()
+    model_tester.run()
 
 
 def main(args: argparse.Namespace) -> int:
@@ -183,7 +145,18 @@ def main(args: argparse.Namespace) -> int:
         print(f"Metadata file\t: {metadata_abs_path}")
     images_dir_abs_path = path.abspath(args.images_dir)
     if not args.quiet:
-        print(f"Images folder\t: {images_dir_abs_path}\n")
+        print(f"Images folder\t: {images_dir_abs_path}")
+    model_checkpoint_abs_path = path.abspath(args.checkpoint)
+    if not args.quiet:
+        print(f"Checkpoint\t: {model_checkpoint_abs_path}\n")
+
+    # Make sure the checkpoint file exists
+    if not path.exists(model_checkpoint_abs_path):
+        print(f"ERROR: File {model_checkpoint_abs_path} does not exist.")
+        return 1
+    if not path.isfile(model_checkpoint_abs_path):
+        print(f"ERROR: {model_checkpoint_abs_path} is a directory.")
+        return 1
 
     # Make sure the target CSV file exists
     if not path.exists(metadata_abs_path):
@@ -201,13 +174,6 @@ def main(args: argparse.Namespace) -> int:
         print(f"ERROR: {images_dir_abs_path} is not a directory.")
         return 1
 
-    # Make sure the model is known
-    if args.model not in GRAYSCALE_MODELS and args.model not in RGB_MODELS:
-        print(
-            f"ERROR: Unknown model {args.model}  (known: {GRAYSCALE_MODELS} {RGB_MODELS})"
-        )
-        return 1
-
     # Load the dataset
     dataset = ThermalDataset(
         metadata_abs_path,
@@ -220,25 +186,19 @@ def main(args: argparse.Namespace) -> int:
     # Load a model
     model = model_from_name(args.model).to(device)
     if not args.quiet:
-        total_params, trainable_params = parameters_count(model)
-        print(f"\nModel: {args.model}")
-        print(
-            f"Parameters: {total_params} ; Trainable: {trainable_params} "
-            f"({trainable_params / total_params * 100:.4f} [%])\n"
-        )
+        total_params, _ = parameters_count(model)
+        print(f"\nModel: {args.model} (Parameters: {total_params})")
         print(model)
 
-    # Train the model
-    train(
+    # Test the model
+    test(
         dataset,
         model,
-        epochs_count=args.epochs,
         batch_size=args.batch,
-        learning_rate=args.learning_rate,
-        folds=args.folds,
         device=device,
         checkpoint=args.checkpoint,
         model_name=args.model,
+        save_predictions=args.save,
     )
 
     return 0
