@@ -27,7 +27,10 @@ from resnet_models import (
 )
 from cnn_models import CnnModel
 from mlp_models import MlpModel, MlpModelDateTime
-from mobilenet_models import MobileNetV3Small_RgbNoMetadata
+from mobilenet_models import (
+    MobileNetV3Small_RgbNoMetadata,
+    MobileNetV3Small_RgbMetadata,
+)
 from model_trainer import ModelTrainer, parameters_count
 
 GRAYSCALE_MODELS = ["SampleModel", "CnnModel", "MlpModel", "MlpModelDateTime"]
@@ -39,6 +42,7 @@ RGB_MODELS = [
     "ResNet18Metadata",
     "ResNet18MetadataMlp",
     "MobileNetV3Small",
+    "MobileNetV3SmallMetadata",
 ]
 
 # Define the arguments/options of the script
@@ -144,6 +148,8 @@ def model_from_name(model_name: str) -> Module:
         return ResNet18_RgbMetadataMlp()
     elif model_name == "MobileNetV3Small":
         return MobileNetV3Small_RgbNoMetadata()
+    elif model_name == "MobileNetV3SmallMetadata":
+        return MobileNetV3Small_RgbMetadata()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
