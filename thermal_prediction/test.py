@@ -28,11 +28,20 @@ from resnet_models import (
 )
 from cnn_models import CnnModel
 from mlp_models import MlpModel, MlpModelDateTime
+from mobilenet_models import MobileNetV3Small_RgbNoMetadata
 from model_trainer import parameters_count
 from model_tester import ModelTester
 
 GRAYSCALE_MODELS = ["SampleModel", "CnnModel", "MlpModel", "MlpModelDateTime"]
-RGB_MODELS = ["ResNet50", "ResNet50Metadata", "ResNet50MetadataMlp", "ResNet18"]
+RGB_MODELS = [
+    "ResNet50",
+    "ResNet50Metadata",
+    "ResNet50MetadataMlp",
+    "ResNet18",
+    "ResNet18Metadata",
+    "ResNet18MetadataMlp",
+    "MobileNetV3Small",
+]
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -167,6 +176,8 @@ def model_from_name(model_name: str) -> Module:
         return ResNet50_RgbMetadataMlp()
     elif model_name == "ResNet18":
         return ResNet18_RgbNoMetadata()
+    elif model_name == "MobileNetV3Small":
+        return MobileNetV3Small_RgbNoMetadata()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
