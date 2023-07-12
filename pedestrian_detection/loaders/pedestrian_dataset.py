@@ -104,9 +104,12 @@ class PedestrianDataset(Dataset):
         """
 
         # Initialize all images with zero bounding boxes
-        self.__targets = [{"boxes": [], "labels": []}] * len(
-            self.__annotations_abs_path
-        )
+        self.__targets = [
+            {
+                "boxes": torch.empty((0, 4), dtype=torch.float),
+                "labels": torch.empty((0, 4), dtype=torch.int64),
+            }
+        ] * len(self.__annotations_abs_path)
 
         for file_idx, file in enumerate(self.__annotations_abs_path):
             # Check if the file is empty first (to avoid Numpy warnings)
