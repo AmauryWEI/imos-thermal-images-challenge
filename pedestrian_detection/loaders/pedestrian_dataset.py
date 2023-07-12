@@ -165,7 +165,7 @@ class PedestrianDataset(Dataset):
         Tensor
             Target image as a Tensor (RGB, 3 channels)
         """
-        image_abs_path = self.__images[index]
+        image_abs_path = self.__images_abs_path[index]
         return read_image(image_abs_path, ImageReadMode.RGB) / 255.0
 
 
