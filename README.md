@@ -26,7 +26,8 @@ Faster R-CNN are included in the repo, try to use a different method.
 2. Download the
 [Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset)
 by following the instructions under [`/dataset/README.md`](./dataset/README.md)
-3. Create a Python virtual environment and install the necessary packages
+3. Create a Python virtual environment and install the necessary packages (using
+[pyenv](https://github.com/pyenv/pyenv) as an example).
 
 ```bash
 pyenv virtualenv 3.10.12 imos

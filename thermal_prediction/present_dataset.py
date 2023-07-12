@@ -59,9 +59,17 @@ def plot_histogram(
     hist, bins = np.histogram(
         dataset.metadata[column_name],
         bins=bins_count,
-        # density=True,
+        density=True,
     )
     ax.stairs(hist, bins, fill=True)
+    ax.vlines(
+        x=mean_value,
+        ymin=ax.get_ylim()[0],
+        ymax=ax.get_ylim()[1],
+        colors="red",
+        label="Mean",
+    )
+    ax.legend()
     ax.set_xlabel(f"{column_name} [{unit}]")
     ax.set_ylabel("Probability")
     ax.set_title(
