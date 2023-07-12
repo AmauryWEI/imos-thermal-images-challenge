@@ -96,6 +96,9 @@ class PedestrianDataset(Dataset):
         - Width of the boudning box (col) (normalized based on the image res)
         - Height of the boudning box (col) (normalized based on the image res)
 
+        WARNING: The X_normalized and Y_normalized are the center center of the bouding
+        box, not the top-left corner of the bounding box.
+
         Knowing that Pytorch requires non-normalized bounding boxes with [x1, y1, x2, y2],
         the annotations are transformed in this function.
         """
@@ -175,15 +178,20 @@ def ltd_annotation_to_pytorch_target(annotation: list[float]) -> Tensor:
     width_normalized, height_normalized) to a Pytorch "target" bounding box (x1, y1, x2,
     y2).
 
+    WARNING: The X_normalized and Y_normalized are the center center of the bouding
+    box, not the top-left corner of the bounding box.
+
     Returns
     -------
     Tensor
         Pytorch "target" annotation
     """
-    IMAGE_WIDTH = 384
-    IMAGE_HEIGHT = 288
-    x1 = IMAGE_WIDTH * annotation[1]
-    y1 = IMAGE_HEIGHT * annotation[2]
-    x2 = x1 + IMAGE_WIDTH * annotation[3]
-    y2 = y1 + IMAGE_HEIGHT * annotation[4]
+    IMAGE_WIDTH = 384.0
+    IMAGE_HEIGHT = 288.0
+    bbox_width = IMAGE_WIDTH * annotation[3]
+    bbox_height = IMAGE_HEIGHT * annotation[4]
+    x1 = IMAGE_WIDTH * annotation[1] - bbox_width / 2
+    y1 = IMAGE_HEIGHT * annotation[2] - bbox_height / 2
+    x2 = IMAGE_WIDTH * annotation[1] + bbox_width / 2
+    y2 = IMAGE_HEIGHT * annotation[2] + bbox_height / 2
     return tensor([x1, y1, x2, y2], dtype=torch.float)
