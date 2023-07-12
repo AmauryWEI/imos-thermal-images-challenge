@@ -66,13 +66,15 @@ def show_random_images(dataset: PedestrianDataset) -> None:
                     tensor_image,
                     target["boxes"],
                     colors="yellow",
-                    width=3,
+                    width=2,
                 )
 
             # Permute the channels for plotting (in: 3 x H x W ; out: H x W x 3)
             axes[row_idx, col_idx].imshow(tensor_image.permute(1, 2, 0))
             # Set image title and turn-off tick labels
-            axes[row_idx, col_idx].set_title(f"Idx: {image_idx}")
+            axes[row_idx, col_idx].set_title(
+                f"Idx: {image_idx} ; {len(target['boxes'])} objects"
+            )
             axes[row_idx, col_idx].set_yticklabels([])
             axes[row_idx, col_idx].set_xticklabels([])
 
