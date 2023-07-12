@@ -6,6 +6,10 @@
 
 import argparse
 from os import path
+import sys
+
+sys.path.append("./loaders/")
+from pedestrian_dataset import PedestrianDataset
 
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
@@ -42,6 +46,9 @@ def main(args: argparse.Namespace) -> int:
         if not path.isdir(folder):
             print(f"ERROR: {folder} is not a folder.")
             return 1
+
+    # Create a dataset from the folders
+    dataset = PedestrianDataset(data_folders_abs_path, quiet=args.quiet)
 
     return 0
 
