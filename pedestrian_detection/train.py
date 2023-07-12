@@ -16,7 +16,7 @@ sys.path.append("./loaders/")
 from pedestrian_dataset import PedestrianDataset
 
 sys.path.append("./models/")
-from fasterrcnn_models import FasterRcnnResnet50FpnV2
+from fasterrcnn_models import FasterRcnnResnet50FpnV2, FasterRcnnMobileNetV3LargeFpn
 from model_trainer import ModelTrainer, parameters_count
 
 # Define the arguments/options of the script
@@ -92,6 +92,8 @@ parser.add_argument(
 def model_from_name(model_name: str) -> Module:
     if model_name == "FasterRcnnResnet50FpnV2":
         return FasterRcnnResnet50FpnV2()
+    elif model_name == "FasterRcnnMobileNetV3LargeFpn":
+        return FasterRcnnMobileNetV3LargeFpn()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
