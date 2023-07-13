@@ -38,6 +38,7 @@ class ModelTester:
         self.__cross_entropy_loss_function = CrossEntropyLoss()
         self.__l1_loss_function = L1Loss()
         self.__save_predictions = save_predictions
+        self.__predictions = []
 
         # Loaded from the checkpoint file and accessible for plotting
         self.__training_losses = []
@@ -75,10 +76,6 @@ class ModelTester:
         """
         Main entry point to run testing
         """
-
-        # Prepare to save predictions
-        predictions = []
-
         # Evaluation mode (the network will output predictions instead of losses)
         self.__model.eval()
 
@@ -101,8 +98,8 @@ class ModelTester:
 
                 # TODO: Manually compute losses here
 
-                # Store the predictions
-                predictions.append(outputs)
+                # Store the predictions (only 1 item in the array, as batch_size = 1)
+                self.__predictions.append(outputs[0])
 
             # TODO: Print performance metrics
 
