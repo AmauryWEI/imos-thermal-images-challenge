@@ -143,16 +143,17 @@ class ModelTrainer:
             # Save the checkpoint (including training & validation losses)
             self.__save_checkpoint()
 
-    def __train(self) -> list[float]:
+    def __train(self) -> np.ndarray:
         """
         Train model weights and track performance
 
         Returns
         -------
-        list[float]
-            Loss of each batch during this epoch
+        ndarray (batches x 5)
+            Losses of each batch during this epoch
+            (combined, classification, localization, objectness, region proposal)
         """
-        batches_losses = []
+        losses = np.zeros((0, 5))
 
         # Training -> gradient computation, model outputs losses directly
         self.__model.train()
@@ -170,24 +171,45 @@ class ModelTrainer:
             # Inference prediction by model
             loss_dict = self.__model(images, targets)
 
-            # TODO: Manually track the individual losses (to print epoch summary)
-
             # Obtain loss function and back propagate to obtain gradient
-            losses = sum(loss for loss in loss_dict.values())
-            losses.backward()
+            combined_loss = sum(loss for loss in loss_dict.values())
+            combined_loss.backward()
 
-            # Keep track of the loss
-            batches_losses.append(losses.item())
+            # Manually track the individual losses (to print epoch summary)
+            loss_classifier = loss_dict["loss_classifier"].item()
+            loss_box_reg = loss_dict["loss_box_reg"].item()
+            loss_objectness = loss_dict["loss_objectness"].item()
+            loss_rpn_box_reg = loss_dict["loss_rpn_box_reg"].item()
+
+            # Update the global losses array
+            losses = np.vstack(
+                [
+                    losses,
+                    [
+                        combined_loss.item(),
+                        loss_classifier,
+                        loss_box_reg,
+                        loss_objectness,
+                        loss_rpn_box_reg,
+                    ],
+                ]
+            )
 
             # Weight learning
             self.__optimizer.step()
 
             # Store performance metrics and update loss on status bar
-            tqdm_iterator.set_postfix_str(f"Loss: {losses.item():.3e}")
+            tqdm_iterator.set_postfix_str(f"Combined Loss: {combined_loss.item():.3e}")
 
-        print(f"Epoch {self.__epoch}: Mean training Loss {np.mean(batches_losses):.4f}")
+        print(
+            f"Epoch {self.__epoch}: Combined loss {np.mean(losses[:, 0]):.4f} ; "
+            f"Classification loss {np.mean(losses[:, 1]):.4f} ; "
+            f"Localization loss {np.mean(losses[:, 2]):.4f} ; "
+            f"Objectness loss {np.mean(losses[:, 3]):.4f} ; "
+            f"Region Proposal loss {np.mean(losses[:, 4]):.4f}"
+        )
 
-        return batches_losses
+        return losses
 
     def __validate(self) -> list[float]:
         """
@@ -239,9 +261,7 @@ class ModelTrainer:
                 "epoch": self.__epoch,
                 "model_state_dict": self.__model.state_dict(),
                 "optimizer_state_dict": self.__optimizer.state_dict(),
-                "last_training_loss_mean": np.mean(self.__training_losses[-1]),
                 "training_losses": self.__training_losses,
-                "last_validation_loss_mean": np.mean(self.__validation_losses[-1]),
                 "validation_losses": self.__validation_losses,
             },
             target_checkpoint_path,
