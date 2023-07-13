@@ -3,6 +3,7 @@
 # Description:  ModelTester class to test neural networks for Challenge #2
 
 from os import path, mkdir
+import sys
 
 from tqdm import tqdm
 import numpy as np
@@ -10,6 +11,11 @@ import torch
 from torch.nn import Module, L1Loss, CrossEntropyLoss
 from torch.utils.data import Dataset, DataLoader
 from torchvision.ops import nms
+
+sys.path.append("./utils")
+from coco_utils import get_coco_api_from_dataset
+from coco_eval import CocoEvaluator
+from engine import _get_iou_types
 
 
 class ModelTester:
@@ -77,6 +83,11 @@ class ModelTester:
         """
         Main entry point to run testing
         """
+        # Convert to COCO format for Pytorch vision to compute mean Average Precision (mAP)
+        coco = get_coco_api_from_dataset(self.__data_loader.dataset)
+        iou_types = _get_iou_types(self.__model)
+        coco_evaluator = CocoEvaluator(coco, iou_types)
+
         # Evaluation mode (the network will output predictions instead of losses)
         self.__model.eval()
 
@@ -103,14 +114,23 @@ class ModelTester:
                     scores=outputs[0]["scores"],
                     iou_threshold=0.3,
                 )
-                final_output = {k: v[bboxes_idx_to_keep] for k, v in outputs[0].items()}
+                final_outputs = [
+                    {k: v[bboxes_idx_to_keep] for k, v in outputs[0].items()}
+                ]
 
-                # TODO: Manually compute losses here
+                # Compute mean Average Precision (mAP) using COCO evaluator
+                res = {
+                    target["image_id"].item(): output
+                    for target, output in zip(targets, final_outputs)
+                }
+                coco_evaluator.update(res)
 
                 # Store the predictions (only 1 item in the array, as batch_size = 1)
-                self.__predictions.append(final_output)
+                self.__predictions.append(final_outputs[0])
 
-            # TODO: Print performance metrics
+            # Print mean performance for the test set
+            coco_evaluator.accumulate()
+            coco_evaluator.summarize()
 
             # Stack the prediction and save as numpy file
             if self.__save_predictions:
