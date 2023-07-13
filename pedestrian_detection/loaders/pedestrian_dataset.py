@@ -103,6 +103,9 @@ class PedestrianDataset(Dataset):
         - Width of the boudning box (col) (normalized based on the image res)
         - Height of the boudning box (col) (normalized based on the image res)
 
+        For the explanation and complete specification of a "target" dictionary, check
+        https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html#defining-the-dataset
+
         WARNING: The X_normalized and Y_normalized are the center center of the bouding
         box, not the top-left corner of the bounding box.
 
@@ -154,6 +157,9 @@ class PedestrianDataset(Dataset):
     def __getitem__(self, index: int) -> tuple[Tensor, dict]:
         """
         Access an image and its "target" (bounding boxes + classes)
+
+        For the explanation and complete specification of a "target" dictionary, check
+        https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html#defining-the-dataset
 
         Parameters
         ----------
