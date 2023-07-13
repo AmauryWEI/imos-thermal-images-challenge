@@ -245,19 +245,19 @@ class ModelTrainer:
             self.__validation_data_loader, desc=f"Validation Fold {self.__fold}"
         )
         with torch.no_grad():
-            for image, target in tqdm_iterator:
+            for images, targets in tqdm_iterator:
                 # Assign tensors to target computing device
-                image = image.to(self.__device, dtype=torch.float)
+                images = list(image.to(self.__device) for image in images)
+                # Targets will only be used for loss computation
+                targets = [
+                    {k: v.to(self.__device) for k, v in t.items()} for t in targets
+                ]
 
-                # Inference prediction by model and obtain loss
-                loss_dict = self.__model(image, target)
-                losses = sum(loss for loss in loss_dict.values())
+                # Inference prediction by model and obtain predictions (instead of loss)
+                outputs = self.__model(images)
+                outputs = [{k: v for k, v in t.items()} for t in outputs]
 
-                # Keep track of the loss
-                batches_losses.append(losses.item())
-
-                # Store performance metrics and update loss on status bar
-                tqdm_iterator.set_postfix_str(f"Loss: {losses.item():.3e}")
+                # TODO: Manually compute losses here
 
         # Print mean performance for this epoch
         print(
