@@ -99,6 +99,9 @@ class PedestrianDataset(Dataset):
         WARNING: The X_normalized and Y_normalized are the center center of the bouding
         box, not the top-left corner of the bounding box.
 
+        WARNING: Pytorch considers "0" as the background class, so pedestrians are
+        associated to the class "1" in the targets.
+
         Knowing that Pytorch requires non-normalized bounding boxes with [x1, y1, x2, y2],
         the annotations are transformed in this function.
         """
@@ -128,14 +131,14 @@ class PedestrianDataset(Dataset):
                     # Store the data inside the class itself
                     self.__targets[file_idx] = {
                         "boxes": tensor_annotations,
-                        "labels": tensor([0] * annotations.shape[0], dtype=torch.int64),
+                        "labels": tensor([1] * annotations.shape[0], dtype=torch.int64),
                     }
                 else:
                     # Load a single annotation
                     tensor_annotation = ltd_annotation_to_pytorch_target(annotations)
                     self.__targets[file_idx] = {
                         "boxes": tensor_annotation.unsqueeze(0),
-                        "labels": tensor([0], dtype=torch.int64),
+                        "labels": tensor([1], dtype=torch.int64),
                     }
 
     def __len__(self) -> int:
