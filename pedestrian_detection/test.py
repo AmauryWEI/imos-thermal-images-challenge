@@ -15,6 +15,11 @@ from torch.utils.data import Dataset
 sys.path.append("./loaders/")
 from pedestrian_dataset import PedestrianDataset
 
+sys.path.append("./models/")
+from fasterrcnn_models import FasterRcnnResnet50FpnV2, FasterRcnnMobileNetV3LargeFpn
+from model_trainer import parameters_count
+
+
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
 
@@ -36,6 +41,23 @@ parser.add_argument(
     action="store_true",
     default=0,
 )
+
+parser.add_argument(
+    "-m",
+    "--model",
+    help="Model to use",
+    type=str,
+    default="FasterRcnnResnet50FpnV2",
+)
+
+
+def model_from_name(model_name: str) -> Module:
+    if model_name == "FasterRcnnResnet50FpnV2":
+        return FasterRcnnResnet50FpnV2()
+    elif model_name == "FasterRcnnMobileNetV3LargeFpn":
+        return FasterRcnnMobileNetV3LargeFpn()
+    else:
+        raise ValueError(f"Unknown model name: {model_name}")
 
 
 def main(args: argparse.Namespace) -> int:
@@ -61,6 +83,17 @@ def main(args: argparse.Namespace) -> int:
 
     # Load the dataset
     dataset = PedestrianDataset(data_folders_abs_path, quiet=args.quiet)
+
+    # Load a model
+    model = model_from_name(args.model).to(device)
+    if not args.quiet:
+        total_params, trainable_params = parameters_count(model)
+        print(f"\nModel: {args.model}")
+        print(
+            f"Parameters: {total_params} ; Trainable: {trainable_params} "
+            f"({trainable_params / total_params * 100:.4f} [%])\n"
+        )
+        print(model)
 
     return 0
 
