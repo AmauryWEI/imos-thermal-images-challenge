@@ -207,6 +207,8 @@ class ModelTrainer:
             # Inference prediction by model
             loss_dict = self.__model(images, targets)
 
+            # TODO: Manually track the individual losses (to print epoch summary)
+
             # Obtain loss function and back propagate to obtain gradient
             losses = sum(loss for loss in loss_dict.values())
             losses.backward()
