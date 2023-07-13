@@ -141,7 +141,7 @@ class ModelTrainer:
         ):
             print(f"ModelTrainer: Fold {self.__fold}:")
 
-            # Prepare validation data
+            # Prepare validation data (batch size should be 1 for inference)
             self.__validation_data_loader = DataLoader(
                 validation_data,
                 batch_size=1,
