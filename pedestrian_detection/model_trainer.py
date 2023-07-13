@@ -10,7 +10,7 @@ from tqdm import tqdm
 import torch
 from torch.optim import Adam
 from torch.nn import Module
-from torch.utils.data import Dataset, DataLoader, Subset, ConcatDataset, random_split
+from torch.utils.data import Dataset, DataLoader, Subset, random_split
 
 
 class ModelTrainer:
