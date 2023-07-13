@@ -4,6 +4,7 @@
 
 from os import path, makedirs
 from typing import Optional
+import sys
 
 import numpy as np
 from tqdm import tqdm
@@ -12,6 +13,11 @@ from torch.optim import Adam
 from torch.nn import Module
 from torch.utils.data import Dataset, DataLoader, Subset, random_split
 from torchvision.ops import nms
+
+sys.path.append("./utils")
+from coco_utils import get_coco_api_from_dataset
+from coco_eval import CocoEvaluator
+from engine import _get_iou_types
 
 
 class ModelTrainer:
@@ -221,6 +227,11 @@ class ModelTrainer:
         list[float]
             Loss of each batch during this validation stage
         """
+        # Convert to COCO format for Pytorch vision to compute mean Average Precision (mAP)
+        coco = get_coco_api_from_dataset(self.__validation_data_loader.dataset)
+        iou_types = _get_iou_types(self.__model)
+        coco_evaluator = CocoEvaluator(coco, iou_types)
+
         batches_losses = []
 
         # Evaluation mode (the network will output predictions instead of losses)
@@ -249,14 +260,20 @@ class ModelTrainer:
                     scores=outputs[0]["scores"],
                     iou_threshold=0.3,
                 )
-                final_output = {k: v[bboxes_idx_to_keep] for k, v in outputs[0].items()}
+                final_outputs = [
+                    {k: v[bboxes_idx_to_keep] for k, v in outputs[0].items()}
+                ]
 
-                # TODO: Manually compute losses here
+                # Compute mean Average Precision (mAP) using COCO evaluator
+                res = {
+                    target["image_id"].item(): output
+                    for target, output in zip(targets, final_outputs)
+                }
+                coco_evaluator.update(res)
 
         # Print mean performance for this epoch
-        print(
-            f"Epoch {self.__epoch}: Mean validation Loss: {np.mean(batches_losses):.4f}"
-        )
+        coco_evaluator.accumulate()
+        coco_evaluator.summarize()
 
         return batches_losses
 
