@@ -162,6 +162,15 @@ class PedestrianDataset(Dataset):
                         "area": bbox_area,
                         "iscrowd": tensor([0], dtype=torch.uint8),
                     }
+            else:
+                # If the image does not have any annotation / bounding boxes
+                self.__targets[file_idx] = {
+                    "boxes": torch.empty((0, 4), dtype=torch.float),
+                    "labels": tensor([], dtype=torch.int64),
+                    "image_id": tensor(file_idx, dtype=torch.int64),
+                    "area": tensor([], dtype=torch.float),
+                    "iscrowd": tensor([0], dtype=torch.uint8),
+                }
 
     def __len__(self) -> int:
         return len(self.__images_abs_path)
