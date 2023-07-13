@@ -11,7 +11,7 @@ from typing import Optional
 
 import torch
 from torch.nn import Module
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, ConcatDataset
 
 sys.path.append("./loaders/")
 from pedestrian_dataset import PedestrianDataset
@@ -55,6 +55,14 @@ parser.add_argument(
     help="Model to use",
     type=str,
     default="FasterRcnnResnet50FpnV2",
+)
+
+parser.add_argument(
+    "-a",
+    "--augment",
+    help="Augment the dataset",
+    type=bool,
+    default=True,
 )
 
 parser.add_argument(
@@ -164,6 +172,15 @@ def main(args: argparse.Namespace) -> int:
         if validation_folder_abs_path != ""
         else None
     )
+
+    # Perform data augmentation
+    if args.augment:
+        augmented_dataset = PedestrianDataset(
+            data_folders_abs_path,
+            augment=True,
+            quiet=args.quiet,
+        )
+        dataset = ConcatDataset([dataset, augmented_dataset])
 
     # Load a model
     model = model_from_name(args.model).to(device)
