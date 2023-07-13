@@ -261,9 +261,7 @@ def ltd_annotation_to_pytorch_target(annotation: list[float]) -> tuple[Tensor, T
 AUGMENTATION_TRANSFORM = transforms.Compose(
     [
         transforms.RandomPhotometricDistort(),
-        # # Fill with the ImageNet dataset average mean pixel
-        # transforms.RandomZoomOut(fill=(0.485, 0.456, 0.406)),
-        # transforms.RandomIoUCrop(),
+        transforms.RandomIoUCrop(),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
     ]
