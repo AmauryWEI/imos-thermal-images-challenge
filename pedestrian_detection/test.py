@@ -11,6 +11,10 @@ import sys
 import torch
 from torch.nn import Module
 from torch.utils.data import Dataset
+from torchvision.utils import draw_bounding_boxes
+from torchvision.transforms.v2 import functional as F
+import matplotlib.pyplot as plt
+import numpy as np
 
 sys.path.append("./loaders/")
 from pedestrian_dataset import PedestrianDataset
@@ -62,6 +66,65 @@ parser.add_argument(
 parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=False)
 
 
+def show_random_images_with_predictions(
+    dataset: PedestrianDataset,
+    predictions: list[dict],
+) -> None:
+    """
+    Show multiple random images of the dataset with the ground truth (green) and the
+    predicted bounding boxes (red)
+
+    Parameters
+    ----------
+    dataset : PedestrianDataset
+        Dataset containing the images and bounding boxes
+    predictions : list[dict]
+        List of predictions (indexes should match the dataset)
+    """
+    ROWS_COUNT = 4
+    COLS_COUNT = 4
+    images_fig, axes = plt.subplots(nrows=ROWS_COUNT, ncols=COLS_COUNT, figsize=(14, 8))
+    images_fig.canvas.manager.set_window_title("Test Images")
+
+    for row_idx in range(ROWS_COUNT):
+        for col_idx in range(COLS_COUNT):
+            image_idx = np.random.randint(0, len(dataset))
+
+            tensor_image, target = dataset[image_idx]
+            tensor_image = F.convert_dtype(tensor_image, torch.uint8)
+
+            # If objects are in the image, draw their bounding boxes
+            if len(target["boxes"]) > 0:
+                tensor_image = draw_bounding_boxes(
+                    tensor_image,
+                    target["boxes"],
+                    colors="green",
+                    width=2,
+                )
+
+            # If objects are in the image, draw their bounding boxes
+            if len(predictions[image_idx]["boxes"]) > 0:
+                tensor_image = draw_bounding_boxes(
+                    tensor_image,
+                    predictions[image_idx]["boxes"],
+                    colors="red",
+                    width=2,
+                )
+
+            # Permute the channels for plotting (in: 3 x H x W ; out: H x W x 3)
+            axes[row_idx, col_idx].imshow(tensor_image.permute(1, 2, 0))
+            # Set image title and turn-off tick labels
+            axes[row_idx, col_idx].set_title(
+                f"Idx: {image_idx} ; GT: {len(target['boxes'])} ; "
+                f"NN: {len(predictions[image_idx]['boxes'])}"
+            )
+            axes[row_idx, col_idx].set_yticklabels([])
+            axes[row_idx, col_idx].set_xticklabels([])
+
+    images_fig.tight_layout()
+    plt.show()
+
+
 def model_from_name(model_name: str) -> Module:
     if model_name == "FasterRcnnResnet50FpnV2":
         return FasterRcnnResnet50FpnV2()
@@ -89,6 +152,7 @@ def test(
         model_name=model_name,
     )
     model_tester.run()
+    show_random_images_with_predictions(dataset, model_tester.predictions)
 
 
 def main(args: argparse.Namespace) -> int:
