@@ -9,6 +9,7 @@ import numpy as np
 import torch
 from torch.nn import Module, L1Loss, CrossEntropyLoss
 from torch.utils.data import Dataset, DataLoader
+from torchvision.ops import nms
 
 
 class ModelTester:
@@ -96,10 +97,18 @@ class ModelTester:
                 outputs = self.__model(images)
                 outputs = [{k: v for k, v in t.items()} for t in outputs]
 
+                # Perform Non-Maximum Suppression (NMS) on the bounding boxes
+                bboxes_idx_to_keep = nms(
+                    boxes=outputs[0]["boxes"],
+                    scores=outputs[0]["scores"],
+                    iou_threshold=0.3,
+                )
+                final_output = {k: v[bboxes_idx_to_keep] for k, v in outputs[0].items()}
+
                 # TODO: Manually compute losses here
 
                 # Store the predictions (only 1 item in the array, as batch_size = 1)
-                self.__predictions.append(outputs[0])
+                self.__predictions.append(final_output)
 
             # TODO: Print performance metrics
 
