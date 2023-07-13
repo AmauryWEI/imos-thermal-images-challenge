@@ -10,12 +10,16 @@ import torch
 from torch import Tensor, tensor
 from torch.utils.data import Dataset
 from torchvision.io import read_image, ImageReadMode
+from torchvision import datapoints
+import torchvision.transforms.v2 as transforms
+from torchvision.transforms.v2 import functional as F
 
 
 class PedestrianDataset(Dataset):
     def __init__(
         self,
         data_folders: list[str],
+        augment: bool = False,
         quiet: bool = False,
     ) -> None:
         """
@@ -28,11 +32,14 @@ class PedestrianDataset(Dataset):
         ----------
         data_folders : list[str]
             List of folders (absolute paths) containing data to display
+        augment : bool
+            True to perform transformations, by default False
         quiet: bool, optional
             No log output, by default False
         """
         self.__data_folders = data_folders
         self.__quiet = quiet
+        self.__augment = augment
 
         # List of the absolute paths of all images
         self.__images_abs_path = []
@@ -158,7 +165,26 @@ class PedestrianDataset(Dataset):
         tuple[Tensor, dict]
             Image data (RGB, 3 chanels, pixel values [0-1]), Target dictionary
         """
-        return self.__fetch_image_as_tensor(index).float(), self.__targets[index]
+        image = self.__fetch_image_as_tensor(index).float()
+        target = self.__targets[index]
+
+        if self.__augment:
+            # Compute bounding boxes as datapoints
+            bboxes = datapoints.BoundingBox(
+                target["boxes"],
+                format=datapoints.BoundingBoxFormat.XYXY,
+                spatial_size=F.get_spatial_size(image),
+            )
+
+            # Perform transformation
+            image, bboxes, labels = AUGMENTATION_TRANSFORM(
+                image, bboxes, target["labels"]
+            )
+            # Update target with new bouding boxes and labels
+            target["boxes"] = bboxes
+            target["labels"] = labels
+
+        return image, target
 
     def __fetch_image_as_tensor(self, index: int) -> Tensor:
         """
@@ -201,3 +227,15 @@ def ltd_annotation_to_pytorch_target(annotation: list[float]) -> Tensor:
     x2 = IMAGE_WIDTH * annotation[1] + bbox_width / 2
     y2 = IMAGE_HEIGHT * annotation[2] + bbox_height / 2
     return tensor([x1, y1, x2, y2], dtype=torch.float)
+
+
+AUGMENTATION_TRANSFORM = transforms.Compose(
+    [
+        transforms.RandomPhotometricDistort(),
+        # Fill with the ImageNet dataset average mean pixel
+        transforms.RandomZoomOut(fill=(0.485, 0.456, 0.406)),
+        transforms.RandomIoUCrop(),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+    ]
+)
