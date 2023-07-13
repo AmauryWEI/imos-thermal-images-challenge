@@ -61,8 +61,8 @@ parser.add_argument(
     "-a",
     "--augment",
     help="Augment the dataset",
-    type=bool,
-    default=False,
+    action="store_true",
+    default=0,
 )
 
 parser.add_argument(
