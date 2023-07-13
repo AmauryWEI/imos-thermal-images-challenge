@@ -11,6 +11,7 @@ import torch
 from torch.optim import Adam
 from torch.nn import Module
 from torch.utils.data import Dataset, DataLoader, Subset, random_split
+from torchvision.ops import nms
 
 
 class ModelTrainer:
@@ -241,6 +242,14 @@ class ModelTrainer:
                 # Inference prediction by model and obtain predictions (instead of loss)
                 outputs = self.__model(images)
                 outputs = [{k: v for k, v in t.items()} for t in outputs]
+
+                # Perform Non-Maximum Suppression (NMS) on the bounding boxes
+                bboxes_idx_to_keep = nms(
+                    boxes=outputs[0]["boxes"],
+                    scores=outputs[0]["scores"],
+                    iou_threshold=0.3,
+                )
+                final_output = {k: v[bboxes_idx_to_keep] for k, v in outputs[0].items()}
 
                 # TODO: Manually compute losses here
 
