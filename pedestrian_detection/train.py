@@ -7,6 +7,7 @@
 import argparse
 import sys
 from os import path
+from typing import Optional
 
 import torch
 from torch.nn import Module
@@ -74,14 +75,6 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-f",
-    "--folds",
-    help="K-folds cross-validation",
-    type=int,
-    default=0,
-)
-
-parser.add_argument(
     "-c",
     "--checkpoint",
     help="Initial model checkpoint to load before training",
@@ -109,11 +102,11 @@ def model_from_name(model_name: str) -> Module:
 
 def train(
     dataset: Dataset,
+    dataset_validation: Optional[Dataset],
     model: Module,
     epochs_count: int,
     batch_size: int,
     learning_rate: float,
-    folds: int,
     device: torch.device,
     checkpoint: str,
     model_name: str,
@@ -121,11 +114,11 @@ def train(
     model_trainer = ModelTrainer(
         model=model,
         dataset=dataset,
+        dataset_validation=dataset_validation,
         epochs_count=epochs_count,
         batch_size=batch_size,
         learning_rate=learning_rate,
         workers_count=4,
-        k_folds=folds,
         device=device,
         load_checkpoint_file=checkpoint,
         model_name=model_name,
@@ -143,7 +136,7 @@ def main(args: argparse.Namespace) -> int:
 
     if not args.quiet:
         print(f"Data folders ({len(args.data_folders)}): {args.data_folders}")
-        print(f"Validataion folder: {args.validation}")
+        print(f"Validation folder: {args.validation}")
 
     # Make sure each folder exists
     data_folders_abs_path = [path.abspath(f) for f in args.data_folders]
@@ -167,6 +160,11 @@ def main(args: argparse.Namespace) -> int:
 
     # Load the dataset
     dataset = PedestrianDataset(data_folders_abs_path, quiet=args.quiet)
+    dataset_validation = (
+        PedestrianDataset([validation_folder_abs_path], quiet=args.quiet)
+        if validation_folder_abs_path != ""
+        else None
+    )
 
     # Load a model
     model = model_from_name(args.model).to(device)
@@ -182,11 +180,11 @@ def main(args: argparse.Namespace) -> int:
     # Train the model
     train(
         dataset,
+        dataset_validation,
         model,
         epochs_count=args.epochs,
         batch_size=args.batch,
         learning_rate=args.learning_rate,
-        folds=args.folds,
         device=device,
         checkpoint=args.checkpoint,
         model_name=args.model,
