@@ -39,7 +39,7 @@ class FasterRcnnResnet50FpnV2(Module):
         # Determine the number of input features for the classifier
         in_features = self.__model.roi_heads.box_predictor.cls_score.in_features
 
-        # Replace the pre-trained head bwith a new one
+        # Replace the pre-trained head with a new one
         self.__model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(
             in_features,
             num_classes=2,
