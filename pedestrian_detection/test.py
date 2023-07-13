@@ -18,6 +18,7 @@ from pedestrian_dataset import PedestrianDataset
 sys.path.append("./models/")
 from fasterrcnn_models import FasterRcnnResnet50FpnV2, FasterRcnnMobileNetV3LargeFpn
 from model_trainer import parameters_count
+from model_tester import ModelTester
 
 
 # Define the arguments/options of the script
@@ -32,6 +33,14 @@ parser.add_argument(
     default=[],
 )
 
+parser.add_argument(
+    "-c",
+    "--checkpoint",
+    metavar="checkpoint_file",
+    help="Model checkpoint to load for testing",
+    type=str,
+    required=True,
+)
 
 # Optional arguments
 parser.add_argument(
@@ -50,6 +59,8 @@ parser.add_argument(
     default="FasterRcnnResnet50FpnV2",
 )
 
+parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=False)
+
 
 def model_from_name(model_name: str) -> Module:
     if model_name == "FasterRcnnResnet50FpnV2":
@@ -58,6 +69,26 @@ def model_from_name(model_name: str) -> Module:
         return FasterRcnnMobileNetV3LargeFpn()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
+
+
+def test(
+    dataset: Dataset,
+    model: Module,
+    device: torch.device,
+    checkpoint: str,
+    model_name: str,
+    save_predictions: bool,
+) -> None:
+    model_tester = ModelTester(
+        model=model,
+        dataset=dataset,
+        workers_count=4,
+        load_checkpoint_file=checkpoint,
+        save_predictions=save_predictions,
+        device=device,
+        model_name=model_name,
+    )
+    model_tester.run()
 
 
 def main(args: argparse.Namespace) -> int:
@@ -81,6 +112,17 @@ def main(args: argparse.Namespace) -> int:
             print(f"ERROR: {folder} is not a folder.")
             return 1
 
+    model_checkpoint_abs_path = path.abspath(args.checkpoint)
+    if not args.quiet:
+        print(f"Checkpoint\t: {model_checkpoint_abs_path}\n")
+    # Make sure the checkpoint file exists
+    if not path.exists(model_checkpoint_abs_path):
+        print(f"ERROR: File {model_checkpoint_abs_path} does not exist.")
+        return 1
+    if not path.isfile(model_checkpoint_abs_path):
+        print(f"ERROR: {model_checkpoint_abs_path} is a directory.")
+        return 1
+
     # Load the dataset
     dataset = PedestrianDataset(data_folders_abs_path, quiet=args.quiet)
 
@@ -94,6 +136,16 @@ def main(args: argparse.Namespace) -> int:
             f"({trainable_params / total_params * 100:.4f} [%])\n"
         )
         print(model)
+
+    # Test the model
+    test(
+        dataset,
+        model,
+        device=device,
+        checkpoint=args.checkpoint,
+        model_name=args.model,
+        save_predictions=args.save,
+    )
 
     return 0
 
