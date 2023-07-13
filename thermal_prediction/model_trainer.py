@@ -150,12 +150,6 @@ class ModelTrainer:
                 num_workers=self.__workers_count,
             )
 
-            # Compute the mean and standard deviation of the training set
-            self.__train_data_loader = DataLoader(
-                train_data,
-                batch_size=self.__batch_size,
-                num_workers=self.__workers_count,
-            )
             # Training
             for self.__epoch in range(
                 self.__starting_epoch,
