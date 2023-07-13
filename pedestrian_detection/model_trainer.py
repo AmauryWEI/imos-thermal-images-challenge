@@ -272,6 +272,7 @@ class ModelTrainer:
                 coco_evaluator.update(res)
 
         # Print mean performance for this epoch
+        coco_evaluator.synchronize_between_processes()
         coco_evaluator.accumulate()
         coco_evaluator.summarize()
 
