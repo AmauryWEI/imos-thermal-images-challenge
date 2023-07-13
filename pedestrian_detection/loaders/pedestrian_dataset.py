@@ -180,9 +180,16 @@ class PedestrianDataset(Dataset):
             image, bboxes, labels = AUGMENTATION_TRANSFORM(
                 image, bboxes, target["labels"]
             )
+
+            # Remove bounding boxes which have the same x1 x2 or y1 y2
+            bboxes_idx_to_keep = []
+            for row_idx, bbox in enumerate(bboxes):
+                if bbox[0] != bbox[2] and bbox[1] != bbox[3]:
+                    bboxes_idx_to_keep.append(row_idx)
+
             # Update target with new bouding boxes and labels
-            target["boxes"] = bboxes
-            target["labels"] = labels
+            target["boxes"] = bboxes[bboxes_idx_to_keep]
+            target["labels"] = labels[bboxes_idx_to_keep]
 
         return image, target
 
