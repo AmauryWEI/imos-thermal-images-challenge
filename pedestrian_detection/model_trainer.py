@@ -191,7 +191,7 @@ class ModelTrainer:
         """
         batches_losses = []
 
-        # Turn on training mode to enable gradient computation
+        # Training -> gradient computation, model outputs losses directly
         self.__model.train()
 
         # Iterate training data with status bar
@@ -235,7 +235,7 @@ class ModelTrainer:
         """
         batches_losses = []
 
-        # Evaluation mode. Disable running mean and variance of batch normalization
+        # Evaluation mode (the network will output predictions instead of losses)
         self.__model.eval()
 
         # Turn off gradient to prevent autograd in backward pass, saves memory
