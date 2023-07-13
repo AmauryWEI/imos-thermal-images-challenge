@@ -133,22 +133,34 @@ class PedestrianDataset(Dataset):
                     tensor_annotations = torch.empty(
                         (annotations.shape[0], 4), dtype=torch.float
                     )
+                    bboxes_areas = torch.empty(annotations.shape[0], dtype=torch.float)
                     for annotation_idx, annotation in enumerate(annotations):
-                        tensor_annotations[
-                            annotation_idx
-                        ] = ltd_annotation_to_pytorch_target(annotation)
+                        (
+                            tensor_annotations[annotation_idx],
+                            bboxes_areas[annotation_idx],
+                        ) = ltd_annotation_to_pytorch_target(annotation)
 
                     # Store the data inside the class itself
                     self.__targets[file_idx] = {
                         "boxes": tensor_annotations,
                         "labels": tensor([1] * annotations.shape[0], dtype=torch.int64),
+                        "image_id": tensor(file_idx, dtype=torch.int64),
+                        "area": bboxes_areas,
+                        "iscrowd": tensor(
+                            [0] * annotations.shape[0], dtype=torch.uint8
+                        ),
                     }
                 else:
                     # Load a single annotation
-                    tensor_annotation = ltd_annotation_to_pytorch_target(annotations)
+                    tensor_annotation, bbox_area = ltd_annotation_to_pytorch_target(
+                        annotations
+                    )
                     self.__targets[file_idx] = {
                         "boxes": tensor_annotation.unsqueeze(0),
                         "labels": tensor([1], dtype=torch.int64),
+                        "image_id": tensor(file_idx, dtype=torch.int64),
+                        "area": bbox_area,
+                        "iscrowd": tensor([0], dtype=torch.uint8),
                     }
 
     def __len__(self) -> int:
@@ -217,7 +229,7 @@ class PedestrianDataset(Dataset):
         return read_image(image_abs_path, ImageReadMode.RGB) / 255.0
 
 
-def ltd_annotation_to_pytorch_target(annotation: list[float]) -> Tensor:
+def ltd_annotation_to_pytorch_target(annotation: list[float]) -> tuple[Tensor, Tensor]:
     """
     Convert an annotation from a TXT file (5 columns: class, X_normalized, Y_normalized,
     width_normalized, height_normalized) to a Pytorch "target" bounding box (x1, y1, x2,
@@ -228,8 +240,10 @@ def ltd_annotation_to_pytorch_target(annotation: list[float]) -> Tensor:
 
     Returns
     -------
-    Tensor
-        Pytorch "target" annotation
+    Tensor (1 x 4, float)
+        Contains the [x1, y1, x2, y2] non-normalized bounding box
+    Tensor (1 x 1, float)
+        Area of the bounding box (in pixels square)
     """
     IMAGE_WIDTH = 384.0
     IMAGE_HEIGHT = 288.0
@@ -239,15 +253,17 @@ def ltd_annotation_to_pytorch_target(annotation: list[float]) -> Tensor:
     y1 = IMAGE_HEIGHT * annotation[2] - bbox_height / 2
     x2 = IMAGE_WIDTH * annotation[1] + bbox_width / 2
     y2 = IMAGE_HEIGHT * annotation[2] + bbox_height / 2
-    return tensor([x1, y1, x2, y2], dtype=torch.float)
+    return tensor([x1, y1, x2, y2], dtype=torch.float), tensor(
+        [bbox_height * bbox_width], dtype=torch.float
+    )
 
 
 AUGMENTATION_TRANSFORM = transforms.Compose(
     [
         transforms.RandomPhotometricDistort(),
-        # Fill with the ImageNet dataset average mean pixel
-        transforms.RandomZoomOut(fill=(0.485, 0.456, 0.406)),
-        transforms.RandomIoUCrop(),
+        # # Fill with the ImageNet dataset average mean pixel
+        # transforms.RandomZoomOut(fill=(0.485, 0.456, 0.406)),
+        # transforms.RandomIoUCrop(),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
     ]
