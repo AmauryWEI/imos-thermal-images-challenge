@@ -129,6 +129,7 @@ class ModelTester:
                 self.__predictions.append(final_outputs[0])
 
             # Print mean performance for the test set
+            coco_evaluator.synchronize_between_processes()
             coco_evaluator.accumulate()
             coco_evaluator.summarize()
 
