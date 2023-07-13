@@ -62,7 +62,7 @@ parser.add_argument(
     "--augment",
     help="Augment the dataset",
     type=bool,
-    default=True,
+    default=False,
 )
 
 parser.add_argument(
