@@ -3,6 +3,7 @@
 # Description:  ModelTrainer class to train neural networks for Challenge #2
 
 from os import path, makedirs
+from typing import Optional
 
 import numpy as np
 from tqdm import tqdm
@@ -24,11 +25,11 @@ class ModelTrainer:
         self,
         model: Module,
         dataset: Dataset,
+        dataset_validation: Optional[Dataset],
         epochs_count: int,
         batch_size: int,
         learning_rate: int,
         workers_count: int,
-        k_folds: int,
         device: torch.device = torch.device("cpu"),
         load_checkpoint_file: str = "",
         model_name: str = "model",
@@ -44,7 +45,6 @@ class ModelTrainer:
 
         self.__optimizer = Adam(model.parameters(), lr=learning_rate)
 
-        self.__fold = 0
         self.__epoch = 0
         self.__train_data_loader = None
         self.__validation_data_loader = None
@@ -58,17 +58,14 @@ class ModelTrainer:
         if not path.exists(self.__checkpoints_dir):
             makedirs(self.__checkpoints_dir)
 
-        # Split into training and validation dataset
-        self.__k_folds_datasets = []
-        if k_folds < 2:
-            print("ModelTrainer: k_folds < 2 => single 80/20 training/validation ratio")
-            # Default training to validation ratio: 80% to 20%
-            self.__k_folds_datasets = [
-                tuple(self.__split_dataset(dataset, (0.8, 0.2), randomize=True))
-            ]
-        else:
-            self.__k_folds_datasets = self.__split_k_folds(
-                dataset, k_folds, randomize=True
+        # Load training and validation datasets
+        self.__dataset = dataset
+        self.__dataset_validation = dataset_validation
+
+        # Check if we actually have a validation dataset, otherwise create one
+        if self.__dataset_validation is None:
+            self.__dataset, self.__dataset_validation = self.__split_dataset(
+                dataset, (0.8, 0.2), randomize=True
             )
 
         # Just before starting, load a checkpoint file if available
@@ -109,76 +106,42 @@ class ModelTrainer:
 
         return split_datasets
 
-    def __split_k_folds(
-        self,
-        dataset: Dataset,
-        k_folds: int,
-        randomize: bool = False,
-    ) -> list[tuple[Dataset, Dataset]]:
-        if k_folds < 2:
-            raise ValueError(f"Number of folds must >= 2 ; got {k_folds}")
-
-        k_fold_datasets: list[tuple[Dataset, Dataset]] = []
-
-        # Create k non-overlapping subsets
-        sub_datasets = self.__split_dataset(dataset, [1] * k_folds, randomize=randomize)
-
-        for fold in range(k_folds):
-            training_set = ConcatDataset(
-                [sub_datasets[i] for i in range(k_folds) if i != fold]
-            )
-            validation_set = sub_datasets[fold]
-            k_fold_datasets.append((training_set, validation_set))
-
-        return k_fold_datasets
-
     def run(self):
         """
         Main entry point to start training
         """
-        for self.__fold, (train_data, validation_data) in enumerate(
-            self.__k_folds_datasets
+        # Prepare validation data (batch size should be 1 for inference)
+        self.__validation_data_loader = DataLoader(
+            self.__dataset_validation,
+            batch_size=1,
+            num_workers=self.__workers_count,
+            collate_fn=collate_fn,
+            drop_last=True,
+        )
+
+        # Training
+        for self.__epoch in range(
+            self.__starting_epoch,
+            self.__starting_epoch + self.__epochs_count,
         ):
-            print(f"ModelTrainer: Fold {self.__fold}:")
-
-            # Prepare validation data (batch size should be 1 for inference)
-            self.__validation_data_loader = DataLoader(
-                validation_data,
-                batch_size=1,
-                num_workers=self.__workers_count,
-                collate_fn=collate_fn,
-                drop_last=True,
-            )
-
-            # Compute the mean and standard deviation of the training set
+            # Prepare training data, reshuffle for each epoch
             self.__train_data_loader = DataLoader(
-                train_data,
+                self.__dataset,
                 batch_size=self.__batch_size,
                 num_workers=self.__workers_count,
+                shuffle=True,
+                collate_fn=collate_fn,
             )
-            # Training
-            for self.__epoch in range(
-                self.__starting_epoch,
-                self.__starting_epoch + self.__epochs_count,
-            ):
-                # Prepare training data, reshuffle for each epoch
-                self.__train_data_loader = DataLoader(
-                    train_data,
-                    batch_size=self.__batch_size,
-                    num_workers=self.__workers_count,
-                    shuffle=True,
-                    collate_fn=collate_fn,
-                )
 
-                training_losses = self.__train()
-                validation_losses = self.__validate()
+            training_losses = self.__train()
+            validation_losses = self.__validate()
 
-                # Update the history of training & validation losses for this fold
-                self.__training_losses.append(training_losses)
-                self.__validation_losses.append(validation_losses)
+            # Update the history of training & validation losses
+            self.__training_losses.append(training_losses)
+            self.__validation_losses.append(validation_losses)
 
-                # Save the checkpoint (including training & validation losses)
-                self.__save_checkpoint()
+            # Save the checkpoint (including training & validation losses)
+            self.__save_checkpoint()
 
     def __train(self) -> list[float]:
         """
@@ -242,7 +205,7 @@ class ModelTrainer:
 
         # Turn off gradient to prevent autograd in backward pass, saves memory
         tqdm_iterator = tqdm(
-            self.__validation_data_loader, desc=f"Validation Fold {self.__fold}"
+            self.__validation_data_loader, desc=f"Validation {self.__epoch}"
         )
         with torch.no_grad():
             for images, targets in tqdm_iterator:
