@@ -41,7 +41,6 @@ parser.add_argument(
     default="",
 )
 
-
 parser.add_argument(
     "-q",
     "--quiet",
