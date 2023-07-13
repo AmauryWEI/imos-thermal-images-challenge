@@ -33,6 +33,15 @@ parser.add_argument(
 
 # Optional arguments
 parser.add_argument(
+    "-v",
+    "--validation",
+    help="Unique folder containing images and labels for validation",
+    type=str,
+    default="",
+)
+
+
+parser.add_argument(
     "-q",
     "--quiet",
     help="Run the script with minimal log output",
@@ -134,6 +143,7 @@ def main(args: argparse.Namespace) -> int:
 
     if not args.quiet:
         print(f"Data folders ({len(args.data_folders)}): {args.data_folders}")
+        print(f"Validataion folder: {args.validation}")
 
     # Make sure each folder exists
     data_folders_abs_path = [path.abspath(f) for f in args.data_folders]
@@ -143,6 +153,16 @@ def main(args: argparse.Namespace) -> int:
             return 1
         if not path.isdir(folder):
             print(f"ERROR: {folder} is not a folder.")
+            return 1
+
+    validation_folder_abs_path = ""
+    if args.validation != "":
+        validation_folder_abs_path = path.abspath(args.validation)
+        if not path.exists(validation_folder_abs_path):
+            print(f"ERROR: {validation_folder_abs_path} does not exist.")
+            return 1
+        if not path.isdir(validation_folder_abs_path):
+            print(f"ERROR: {validation_folder_abs_path} is not a folder.")
             return 1
 
     # Load the dataset
