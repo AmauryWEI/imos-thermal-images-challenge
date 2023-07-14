@@ -22,6 +22,7 @@ from fasterrcnn_models import (
     FasterRcnnMobileNetV3LargeFpn,
     FasterRcnnMobileNetV3Large320Fpn,
 )
+from retinanet_models import RetinaNetResnet50FpnV2
 from model_trainer import ModelTrainer, parameters_count
 
 # Define the arguments/options of the script
@@ -109,6 +110,8 @@ def model_from_name(model_name: str) -> Module:
         return FasterRcnnMobileNetV3LargeFpn()
     elif model_name == "FasterRcnnMobileNetV3Large320Fpn":
         return FasterRcnnMobileNetV3Large320Fpn()
+    elif model_name == "RetinaNetResnet50FpnV2":
+        return RetinaNetResnet50FpnV2()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
