@@ -29,10 +29,11 @@ from fasterrcnn_models import (
 
 class ModelTrainer:
     """
-    A training worker for neural network models.
+    A training worker for neural network models used in challenge #2
 
-    Loads an initial state of a neural network model, train it using some parameters and
-    a given dataset. Finally, exports the training result as a checkpoint file.
+    Loads an initial state of a neural network model, trains it using some parameters
+    and a given dataset. After each epoch, the model weights and losses (training &
+    validation) are exported in a checkpoint file.
     """
 
     def __init__(
@@ -91,6 +92,28 @@ class ModelTrainer:
         ratios: list[float],
         randomize: bool = False,
     ) -> list[Subset]:
+        """
+        Split a unique dataset into multiple subset datasets
+
+        Parameters
+        ----------
+        dataset : Dataset
+            Main dataset to split
+        ratios : list[float]
+            Ratios (normalized or not) defining the dataset split (variable length)
+        randomize : bool, optional
+            Split the main dataset randomly, by default False
+
+        Returns
+        -------
+        list[Subset]
+            Split datasets
+
+        Raises
+        ------
+        ValueError
+            Invalid splitting ratios
+        """
         if len(ratios) == 0:
             raise ValueError("Ratios cannot be an empty list")
         if any(r < 0 for r in ratios):
@@ -285,6 +308,10 @@ class ModelTrainer:
         coco_evaluator.summarize()
 
     def __save_checkpoint(self) -> None:
+        """
+        Save the model weights, optimizer states, training losses and validation losses
+        inside a checkpoint file.
+        """
         target_checkpoint_path = path.join(
             self.__checkpoints_dir,
             f"{self.__model_name}_epoch-{self.__epoch}.pt",
@@ -300,6 +327,20 @@ class ModelTrainer:
         )
 
     def __load_checkpoint(self, checkpoint_file_path: str) -> None:
+        """
+        Load a checkpoint file (model weights, optimizer weights, training losses) to
+        resume training a network.
+
+        Parameters
+        ----------
+        checkpoint_file_path : str
+            Absolute path to the checkpoint file to load
+
+        Raises
+        ------
+        RuntimeError
+            Invalid or inexistant checkpoint file
+        """
         print(f"ModelTrainer: loading checkpoint {checkpoint_file_path}")
 
         # Make sure the target checkpoint file exists
