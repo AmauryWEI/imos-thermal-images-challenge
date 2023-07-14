@@ -97,6 +97,16 @@ parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=
 
 
 def plot_losses(model_tester: ModelTester, model_name: str) -> None:
+    """
+    Plots the training and validation MSE losses of a network ready for testing.
+
+    Parameters
+    ----------
+    model_tester : ModelTester
+        Contains the model, its training and validation losses history
+    model_name : str
+        Name of the model (for figure and plot titles)
+    """
     losses_fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(14, 8))
     losses_fig.canvas.manager.set_window_title(
         f"{model_name} - Training & Validation Losses"
