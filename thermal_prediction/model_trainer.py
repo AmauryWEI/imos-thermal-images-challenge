@@ -14,10 +14,11 @@ from torch.utils.data import Dataset, DataLoader, Subset, ConcatDataset, random_
 
 class ModelTrainer:
     """
-    A training worker for neural network models.
+    A training worker for neural network models used in challenge #1
 
-    Loads an initial state of a neural network model, train it using some parameters and
-    a given dataset. Finally, exports the training result as a checkpoint file.
+    Loads an initial state of a neural network model, trains it using some parameters
+    and a given dataset. After each epoch, the model weights and losses (training &
+    validation) are exported in a checkpoint file.
     """
 
     def __init__(
@@ -37,7 +38,7 @@ class ModelTrainer:
         self.__model = model.to(device)
         self.__device = device
 
-        self.__starting_epoch = 0
+        self.__starting_epoch = 0  # Used to potentially resume training from checkpoint
         self.__epochs_count = epochs_count
         self.__batch_size = batch_size
         self.__workers_count = workers_count
@@ -83,6 +84,28 @@ class ModelTrainer:
         ratios: list[float],
         randomize: bool = False,
     ) -> list[Subset]:
+        """
+        Split a unique dataset into multiple subset datasets
+
+        Parameters
+        ----------
+        dataset : Dataset
+            Main dataset to split
+        ratios : list[float]
+            Ratios (normalized or not) defining the dataset split (variable length)
+        randomize : bool, optional
+            Split the main dataset randomly, by default False
+
+        Returns
+        -------
+        list[Subset]
+            Split datasets
+
+        Raises
+        ------
+        ValueError
+            Invalid splitting ratios
+        """
         if len(ratios) == 0:
             raise ValueError("Ratios cannot be an empty list")
         if any(r < 0 for r in ratios):
@@ -117,6 +140,28 @@ class ModelTrainer:
         k_folds: int,
         randomize: bool = False,
     ) -> list[tuple[Dataset, Dataset]]:
+        """
+        Split a unique dataset into multiple k-folds cross-validation datasets
+
+        Parameters
+        ----------
+        dataset : Dataset
+            Main dataset to split
+        k_folds : int
+            Number of folds for cross-validation
+        randomize : bool, optional
+            Split the main dataset randomly, by default False
+
+        Returns
+        -------
+        list[tuple[Dataset, Dataset]]
+            Lists of k (training, validation) datasets
+
+        Raises
+        ------
+        ValueError
+            Invalid number of folds
+        """
         if k_folds < 2:
             raise ValueError(f"Number of folds must >= 2 ; got {k_folds}")
 
@@ -285,6 +330,20 @@ class ModelTrainer:
         )
 
     def __load_checkpoint(self, checkpoint_file_path: str) -> None:
+        """
+        Load a checkpoint file (model weights, optimizer weights, losses) to resume
+        training a network.
+
+        Parameters
+        ----------
+        checkpoint_file_path : str
+            Absolute path to the checkpoint file to load
+
+        Raises
+        ------
+        RuntimeError
+            Invalid or inexistant checkpoint file
+        """
         print(f"ModelTrainer: loading checkpoint {checkpoint_file_path}")
 
         # Make sure the target checkpoint file exists
