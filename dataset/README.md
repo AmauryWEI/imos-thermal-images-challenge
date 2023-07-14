@@ -34,11 +34,37 @@ mv LTD_Dataset/LTD_Dataset/Video\ Clips LTD_Dataset/LTD_Dataset/Data
 mv LTD_Dataset/LTD_Dataset/metatada.csv LTD_Dataset/LTD_Dataset/Data/
 ```
 
+4. Replace all the spaces by underscores in subfolders of 
+`Data_Annotated_Subset_Object_Detectors`:
+
+```bash
+cd Data_Annotated_Subset_Object_Detectors/
+# Rename testing set directories
+mv testing/Apr\ Month testing/Apr_Month
+mv testing/Aug\ Month testing/Aug_Month
+mv testing/Jan\ Month testing/Jan_Month
+# Rename training set directories
+mv testing/Feb\ Day testing/Feb_Day
+mv testing/Feb\ Month testing/Feb_Month
+mv testing/Feb\ Week testing/Feb_Week
+mv testing/Mar\ Week testing/Mar_Week
+```
+
 After extraction and renaming, the folder structure should be:
 
     .
     ├── dataset/
     |   ├── Data_Annotated_Subset_Object_Detectors/
+    |   |   ├── testing/
+    |   |   |   ├── Apr_Month/
+    |   |   |   ├── Aug_Month/
+    |   |   |   └── Jan_Month/
+    |   |   ├── training/
+    |   |   |   ├── Feb_Day/
+    |   |   |   ├── Feb_Month/
+    |   |   |   ├── Feb_Week/
+    |   |   |   └── Mar_Week/
+    |   |   └── validation/
     |   ├── Data_Subset_Autoencoders_Anomaly_Detectors/
     |   ├── LTD_Dataset/
     |   |   └── LTD_Dataset/
@@ -57,7 +83,7 @@ After extraction and renaming, the folder structure should be:
 
 This section covers how to generate the required datasets to use in both challenges.
 
-### Thermal Images
+### Challenge #1 
 
 To generate the dataset of unique thermal images, run the following command:
 
@@ -97,3 +123,7 @@ generation, you should obtain the following folder structure:
     |   |       └── load_video_metadata.py
     |   └── README.md
     └── README.md
+
+### Challenge #2
+
+The dataset is ready to use, no action required.
