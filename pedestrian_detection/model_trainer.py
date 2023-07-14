@@ -19,6 +19,13 @@ from coco_utils import get_coco_api_from_dataset
 from coco_eval import CocoEvaluator
 from engine import _get_iou_types
 
+sys.path.append("./models")
+from fasterrcnn_models import (
+    FasterRcnnResnet50FpnV2,
+    FasterRcnnMobileNetV3LargeFpn,
+    FasterRcnnMobileNetV3Large320Fpn,
+)
+
 
 class ModelTrainer:
     """
@@ -181,10 +188,20 @@ class ModelTrainer:
             combined_loss.backward()
 
             # Manually track the individual losses (to print epoch summary)
-            loss_classifier = loss_dict["loss_classifier"].item()
-            loss_box_reg = loss_dict["loss_box_reg"].item()
-            loss_objectness = loss_dict["loss_objectness"].item()
-            loss_rpn_box_reg = loss_dict["loss_rpn_box_reg"].item()
+            if (
+                isinstance(self.__model, FasterRcnnResnet50FpnV2)
+                or isinstance(self.__model, FasterRcnnMobileNetV3LargeFpn)
+                or isinstance(self.__model, FasterRcnnMobileNetV3Large320Fpn)
+            ):
+                loss_classifier = loss_dict["loss_classifier"].item()
+                loss_box_reg = loss_dict["loss_box_reg"].item()
+                loss_objectness = loss_dict["loss_objectness"].item()
+                loss_rpn_box_reg = loss_dict["loss_rpn_box_reg"].item()
+            else:
+                loss_classifier = loss_dict["classification"].item()
+                loss_box_reg = loss_dict["bbox_regression"].item()
+                loss_objectness = 0
+                loss_rpn_box_reg = 0
 
             # Update the global losses array
             losses = np.vstack(
