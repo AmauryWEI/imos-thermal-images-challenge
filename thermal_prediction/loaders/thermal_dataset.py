@@ -34,6 +34,12 @@ RAW_METADATA_COLUMNS = [
 
 
 class ThermalDataset(Dataset):
+    """
+    Class (inherting from Pytorch's Dataset) representing a dataset to use for the
+    thermal prediction challenge. Each item is composed of an image (grayscale or RGB),
+    its normalized metadata, and the ground truth temperature (in degrees Celsius).
+    """
+
     def __init__(
         self,
         metadata_abs_path: str,
@@ -52,8 +58,10 @@ class ThermalDataset(Dataset):
             Absolute path to the metadata_images.csv file
         images_abs_path : str
             Absolute path to the root folder containing the images subfolders
+        grayscale_to_rgb : bool
+            Converted the raw images to RGB, by default False
         normalize: bool, optional
-            Normalize the images and metadata, by default True
+            Normalize the metadata, by default True
         augment: bool, optional
             Augment the dataset, by default False
         quiet: bool, optional
@@ -100,7 +108,8 @@ class ThermalDataset(Dataset):
 
     def __getitem__(self, index: int) -> tuple[Tensor, Tensor, float]:
         """
-        Access an image, its metadata, and its ground truth temperature
+        Access an image, its normalized metadata, and its ground truth temperature (in
+        degrees Celsius).
 
         Parameters
         ----------
@@ -110,7 +119,7 @@ class ThermalDataset(Dataset):
         Returns
         -------
         tuple[Tensor, Tensor, float]
-            Image data, Image metadata, Ground truth Temperature
+            Image data, Image metadata, Ground truth temperature
         """
         image = self.__fetch_image_as_tensor(index).float()
         metadata = self.__metadata_as_tensor(index).float()
@@ -130,7 +139,7 @@ class ThermalDataset(Dataset):
         Returns
         -------
         Tensor
-            Target grayscale image as a Tensor
+            Target image (grayscale or RGB, depending on the class configuration)
         """
         data_frame_row = self.__metadata.loc[index]
         image_abs_path = path.join(
@@ -167,6 +176,13 @@ class ThermalDataset(Dataset):
         return Tensor(self.__metadata.iloc[index, 5:14])
 
     def __create_day_and_hour_columns(self) -> None:
+        """
+        Create two new metadata columns "Day" and "Hour" to represent the "DateTime"
+        column.
+
+        The day is a value between 0 and 365, while "Hour" is an amount of minutes
+        (between 0 and 1439). This function will update self.__metadata.
+        """
         if "Day" not in self.__metadata or "Hour" not in self.__metadata:
             # Create empty columns in the DataFrame
             self.__metadata["Day"] = 0
@@ -193,6 +209,13 @@ class ThermalDataset(Dataset):
                 print("ThermalDataset: 'Day' and 'Hour' columns created")
 
     def __normalize_metadata(self) -> None:
+        """
+        Normalize the metadata stored inside self.__metadata.
+
+        Bounded values (humidity, wind direction, min of sunshine, day, hour) will be
+        rescaled between [0 - 1]. The unbounded values (all the rest) will be normalized
+        based on mean and standard deviation.
+        """
         # Normalize the "Humidity" column (between 0 and 100 [%])
         self.__metadata["Humidity"] = self.__metadata["Humidity"] / 100
 
