@@ -312,6 +312,10 @@ class ModelTrainer:
         return batches_losses
 
     def __save_checkpoint(self) -> None:
+        """
+        Save the model weights, optimizer states, training losses and validation losses
+        inside a checkpoint file.
+        """
         target_checkpoint_path = path.join(
             self.__checkpoints_dir,
             f"{self.__model_name}_fold-{self.__fold}_epoch-{self.__epoch}.pt",
