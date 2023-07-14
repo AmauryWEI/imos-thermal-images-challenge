@@ -34,14 +34,17 @@ pyenv virtualenv 3.10.12 imos
 pip install -r requirements.txt
 ```
 
-### Quick Start Guide
+### Challenge #1
 
-1. Split the raw `Image_Dataset` into three separate training, validation, and testing
-sets:
+To get started on challenge #1, check the dedicated
+[`/thermal_prediction/README.md`](./thermal_prediction/README.md) file, which contains
+instructions to visualize the dataset, train models, and test them.
 
-    ```bash
-    python data_splitting/create_split_dataset.py ./dataset/LTD_Dataset/LTD_Dataset/Image_Dataset/metada_images.csv -o ./dataset/LTD_Dataset/LTD_Dataset/Split_Dataset/
-    ```
+### Challenge #2
+
+To get started on challenge #2, check the dedicated
+[`/pedestrian_detection/README.md`](./pedestrian_detection/README.md) file, which 
+contains instructions to visualize the dataset, train models, and test them.
 
 ## Q&A
 
