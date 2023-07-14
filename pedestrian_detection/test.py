@@ -70,6 +70,89 @@ parser.add_argument(
 parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=False)
 
 
+def plot_loss(
+    ax,
+    epoch_losses: np.ndarray,
+    batch_losses: np.ndarray,
+    loss_name: str,
+) -> None:
+    textbox_contents = "\n".join(
+        (f"Last {loss_name} = {epoch_losses[-1]:.3e}",),
+    )
+    props = dict(boxstyle="round", facecolor="white", alpha=0.5)
+    # Place a text box in bottom left in axes coords
+    ax.text(
+        0.02,
+        0.1,
+        textbox_contents,
+        transform=ax.transAxes,
+        fontsize=8,
+        verticalalignment="top",
+        bbox=props,
+    )
+
+    # Plot the epoch losses on the first X axis
+    ax.plot(epoch_losses.flatten(), color="C0")
+    # Plot the batches loss on a second X axis
+    ax2 = ax.twiny()
+    ax2.plot(batch_losses.flatten(), alpha=0.25, color="C0")
+
+    # Format the plot
+    max_loss = np.amax(epoch_losses)
+    ax.set_ylim([0, 1.2 * max_loss])
+    ax.set_xlim([0, len(epoch_losses.flatten()) - 1])
+    ax2.set_ylim([0, 1.2 * max_loss])
+    ax2.set_xlim([0, len(batch_losses.flatten()) - 1])
+    ax2.set_xticklabels([])
+    ax.grid(visible=True)
+    ax.set_xlabel("Epoch [u]")
+    ax.set_ylabel(loss_name)
+    ax.set_title(loss_name)
+
+
+def plot_losses(model_tester: ModelTester, model_name: str) -> None:
+    losses_fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(14, 10))
+    losses_fig.canvas.manager.set_window_title(f"{model_name} - Training Losses")
+
+    all_training_losses = np.empty((0, 5))
+    mean_training_losses_epoch = np.empty((0, 5))
+    for batch_losses in model_tester.training_losses:
+        all_training_losses = np.vstack([all_training_losses, batch_losses])
+        mean_training_losses_epoch = np.vstack(
+            [mean_training_losses_epoch, np.mean(batch_losses, axis=0)]
+        )
+
+    # Plot the different losses on the subplots
+    plot_loss(
+        ax[0, 0],
+        mean_training_losses_epoch[:, 1],
+        all_training_losses[:, 1],
+        "Classifier Loss",
+    )
+    plot_loss(
+        ax[0, 1],
+        mean_training_losses_epoch[:, 2],
+        all_training_losses[:, 2],
+        "Box Reg Loss",
+    )
+    plot_loss(
+        ax[1, 0],
+        mean_training_losses_epoch[:, 3],
+        all_training_losses[:, 3],
+        "Objectness Loss",
+    )
+    plot_loss(
+        ax[1, 1],
+        mean_training_losses_epoch[:, 4],
+        all_training_losses[:, 4],
+        "Feature Prop Loss",
+    )
+
+    losses_fig.tight_layout()
+
+    plt.show(block=True)
+
+
 def show_random_images_with_predictions(
     dataset: PedestrianDataset,
     predictions: list[dict],
@@ -157,6 +240,7 @@ def test(
         device=device,
         model_name=model_name,
     )
+    plot_losses(model_tester, model_name)
     model_tester.run()
     show_random_images_with_predictions(dataset, model_tester.predictions)
 
