@@ -49,7 +49,7 @@ parser.add_argument(
 
 def show_random_images(dataset: PedestrianDataset) -> None:
     """
-    Show multiple random images of the dataset
+    Show multiple random images of the dataset with their annotations (bounding boxes)
 
     Parameters
     ----------
