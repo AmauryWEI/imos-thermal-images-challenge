@@ -58,7 +58,6 @@ class ModelTrainer:
 
         # Stored globally to keep track of all losses in each checkpoint
         self.__training_losses = []
-        self.__validation_losses = []
 
         self.__model_name = model_name  # Checkpoints will be saved with this name
         self.__checkpoints_dir = path.abspath(checkpoints_dir)
@@ -141,11 +140,10 @@ class ModelTrainer:
             )
 
             training_losses = self.__train()
-            validation_losses = self.__validate()
+            self.__validate()
 
             # Update the history of training & validation losses
             self.__training_losses.append(training_losses)
-            self.__validation_losses.append(validation_losses)
 
             # Save the checkpoint (including training & validation losses)
             self.__save_checkpoint()
@@ -218,21 +216,14 @@ class ModelTrainer:
 
         return losses
 
-    def __validate(self) -> list[float]:
+    def __validate(self) -> None:
         """
         Validate model weights and track performance (no training)
-
-        Returns
-        -------
-        list[float]
-            Loss of each batch during this validation stage
         """
         # Convert to COCO format for Pytorch vision to compute mean Average Precision (mAP)
         coco = get_coco_api_from_dataset(self.__validation_data_loader.dataset)
         iou_types = _get_iou_types(self.__model)
         coco_evaluator = CocoEvaluator(coco, iou_types)
-
-        batches_losses = []
 
         # Evaluation mode (the network will output predictions instead of losses)
         self.__model.eval()
@@ -276,8 +267,6 @@ class ModelTrainer:
         coco_evaluator.accumulate()
         coco_evaluator.summarize()
 
-        return batches_losses
-
     def __save_checkpoint(self) -> None:
         target_checkpoint_path = path.join(
             self.__checkpoints_dir,
@@ -289,7 +278,6 @@ class ModelTrainer:
                 "model_state_dict": self.__model.state_dict(),
                 "optimizer_state_dict": self.__optimizer.state_dict(),
                 "training_losses": self.__training_losses,
-                "validation_losses": self.__validation_losses,
             },
             target_checkpoint_path,
         )
@@ -308,7 +296,6 @@ class ModelTrainer:
         self.__model.load_state_dict(checkpoint["model_state_dict"])
         self.__optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         self.__training_losses = checkpoint["training_losses"]
-        self.__validation_losses = checkpoint["validation_losses"]
 
 
 def parameters_count(model: Module) -> tuple[int, int]:
