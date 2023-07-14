@@ -13,10 +13,10 @@ from torch.utils.data import Dataset, DataLoader
 
 class ModelTester:
     """
-    A testing worker for neural network models.
+    A testing worker for neural network models used in challenge #1
 
-    Loads a neural network model, tests it on a given dataset, and computes different
-    performance metrics.
+    Loads a neural network model from a checkpoint file, tests it on a given dataset,
+    and computes different performance metrics (MSE and MAE losses).
     """
 
     def __init__(
@@ -62,10 +62,28 @@ class ModelTester:
 
     @property
     def training_losses(self) -> list[list[float]]:
+        """
+        MSE losses from network training (stored in the checkpoint file) at each epoch
+        (exterior index) and each batch (internal index).
+
+        Returns
+        -------
+        list[list[float]]
+            MSE losses during network training
+        """
         return self.__training_losses
 
     @property
     def validation_losses(self) -> list[list[float]]:
+        """
+        MSE losses from network validation (stored in the checkpoint file) at each epoch
+        (exterior index) and each batch (internal index).
+
+        Returns
+        -------
+        list[list[float]]
+            MSE losses during network validation
+        """
         return self.__validation_losses
 
     def run(self):
@@ -109,6 +127,19 @@ class ModelTester:
                 pass
 
     def __load_checkpoint(self, checkpoint_file_path: str) -> None:
+        """
+        Load a checkpoint file (model weights and losses) to test a network.
+
+        Parameters
+        ----------
+        checkpoint_file_path : str
+            Absolute path to the checkpoint file to load
+
+        Raises
+        ------
+        RuntimeError
+            Invalid or inexistant checkpoint file
+        """
         print(f"ModelTester: loading checkpoint {checkpoint_file_path}")
 
         # Make sure the target checkpoint file exists
