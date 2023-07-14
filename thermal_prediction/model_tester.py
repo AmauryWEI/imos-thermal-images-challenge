@@ -115,7 +115,7 @@ class ModelTester:
         if not path.exists(checkpoint_file_path):
             raise RuntimeError(f"Checkpoint {checkpoint_file_path} does not exist.")
         if not path.isfile(checkpoint_file_path):
-            raise (f"{checkpoint_file_path} is not a file.")
+            raise RuntimeError(f"{checkpoint_file_path} is not a file.")
 
         checkpoint = torch.load(checkpoint_file_path, map_location=self.__device)
         self.__model.load_state_dict(checkpoint["model_state_dict"])
