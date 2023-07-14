@@ -1,3 +1,5 @@
+BATCH SIZE = 1 ; TRAINABLE_LAYERS = 3
+
 Model: FasterRcnnResnet50FpnV2
 Parameters: 43256153 ; Trainable: 43030809 (99.4790 [%])
 

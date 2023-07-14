@@ -1,3 +1,5 @@
+BATCH SIZE = 8 ; TRAINABLE_LAYERS = 3
+
 Model: FasterRcnnMobileNetV3LargeFpn
 Parameters: 18930229 ; Trainable: 18871333 (99.6889 [%])
 
