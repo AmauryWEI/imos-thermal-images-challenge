@@ -35,8 +35,8 @@ python present_dataset.py ../dataset/Data_Annotated_Subset_Object_Detectors/trai
 ```
 
 <p float="left">
-    <img src="./doc/example_raw_dataset.png" height="200px" alt="Images from raw dataset">
-    <img src="./doc/example_augmented_dataset.png" height="200px" alt="Images from augmented dataset">
+    <img src="./doc/example_raw_dataset.png" height="280px" alt="Images from raw dataset">
+    <img src="./doc/example_augmented_dataset.png" height="280px" alt="Images from augmented dataset">
 </p>
 
 ### Training
@@ -151,8 +151,8 @@ metrics will be logged in the terminal. Multiple random test images will also be
 with the ground truth bouding boxes in green, and the predictions in red.
 
 <p float="left">
-    <img src="./doc/example_loss_graph.png" height="200px" alt="Training loss graphs">
-    <img src="./doc/example_test_images.png" height="200px" alt="Test images with predictions">
+    <img src="./doc/example_loss_graph.png" height="300px" alt="Training loss graphs">
+    <img src="./doc/example_test_images.png" height="300px" alt="Test images with predictions">
 </p>
 
 
