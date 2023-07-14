@@ -42,16 +42,11 @@ class ModelTester:
 
         self.__workers_count = workers_count
 
-        self.__cross_entropy_loss_function = CrossEntropyLoss()
-        self.__l1_loss_function = L1Loss()
         self.__save_predictions = save_predictions
         self.__predictions = []
 
         # Loaded from the checkpoint file and accessible for plotting
         self.__training_losses = []
-        self.__validation_losses = []
-        self.__testing_l1_losses = []
-        self.__testing_cross_entropy_losses = []
 
         # Ensure the directory to save predictions exists
         if self.__save_predictions:
@@ -70,10 +65,6 @@ class ModelTester:
     @property
     def training_losses(self) -> list[np.ndarray]:
         return self.__training_losses
-
-    @property
-    def validation_losses(self) -> list[np.ndarray]:
-        return self.__validation_losses
 
     @property
     def predictions(self) -> list[dict]:
@@ -150,7 +141,6 @@ class ModelTester:
         checkpoint = torch.load(checkpoint_file_path, map_location=self.__device)
         self.__model.load_state_dict(checkpoint["model_state_dict"])
         self.__training_losses = checkpoint["training_losses"]
-        self.__validation_losses = checkpoint["validation_losses"]
 
 
 def collate_fn(batch):
