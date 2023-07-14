@@ -1,22 +1,21 @@
 # imos-thermal-images-challenge
 
 This repository contains documentation and source code to tackle two deep-learning
-challenges.
+challenges on the [Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset).
 
 ## Challenges Descriptions
 
 ### Challenge 1
 
-Using this
-[Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset)
-to implement a deep-learning based method to predict the temperature in Celsius using
-the thermal images (and metadata if needed). Use the code provided in the repo for data
-loading, and feel free to use pytorch or tensorflow as you see fit.
+Using the
+[Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset),
+implement a deep-learning based method to predict the temperature in Celsius using
+the thermal images (and metadata if needed).
 
 ### Challenge 2
 
-Implement a pedestrian detection method based of the labelled data. Since YOLOv5 and
-Faster R-CNN are included in the repo, try to use a different method.
+Implement a pedestrian detection method based of the labelled data. Try methods
+different from YOLOv5 and Faster R-CNN.
 
 ## Getting Started
 
@@ -43,7 +42,7 @@ instructions to visualize the dataset, train models, and test them.
 ### Challenge #2
 
 To get started on challenge #2, check the dedicated
-[`/pedestrian_detection/README.md`](./pedestrian_detection/README.md) file, which 
+[`/pedestrian_detection/README.md`](./pedestrian_detection/README.md) file, which
 contains instructions to visualize the dataset, train models, and test them.
 
 ## Q&A
