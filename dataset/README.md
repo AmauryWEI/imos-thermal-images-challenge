@@ -17,9 +17,22 @@ as a `.zip` archive on your machine.
 
 1. Rename the `LTD Dataset` folders to `LTD_Dataset` (with an underscore)
 
-2. Rename the `Video Clips` folder to `Data`
+```bash
+mv LTD\ Dataset LTD_Dataset/
+mv LTD_Dataset/LTD\ Dataset LTD_Dataset/LTD_Dataset
+```
 
-3. Move the `metatada.csv` file inside the `/Data` folder
+2. Rename the `LTD_Dataset/LTD_Dataset/Video Clips` folder to `LTD_Dataset/LTD_Dataset/Data`
+
+```bash
+mv LTD_Dataset/LTD_Dataset/Video\ Clips LTD_Dataset/LTD_Dataset/Data
+```
+
+3. Move the `LTD_Dataset/LTD_Dataset/metatada.csv` file inside the `LTD_Dataset/LTD_Dataset/Data/` folder
+
+```bash
+mv LTD_Dataset/LTD_Dataset/metatada.csv LTD_Dataset/LTD_Dataset/Data/
+```
 
 After extraction and renaming, the folder structure should be:
 
