@@ -8,8 +8,11 @@ from torch.nn import Module, Conv2d, BatchNorm2d, Linear, MaxPool2d, Dropout
 
 class CnnModel(Module):
     """
-    Convolutional Neural Network with 5x5 kernels and batch normalization for
+    Convolutional Neural Network with (5x5) and (3x3) kernels and 2D max pooling for
     temperature prediction on the Long-term Thermal Drift Dataset.
+
+    During training, the network internally uses batch normalization and dropout (with a
+    drop probability of 0.2).
 
     Input:  Image (cols: 384 ; rows: 288) (Tensor 288 x 384) + Metadata (Tensor 9 x 1)
     Output: Temperature (float)
