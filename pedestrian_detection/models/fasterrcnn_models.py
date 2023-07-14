@@ -1,6 +1,6 @@
-# File:         cnn_models.py
+# File:         fasterrcnn_models.py
 # Date:         2023/07/09
-# Description:  Models based on convolutional architectures (CNNs)
+# Description:  Models based on Faster R-CNN architectures
 
 from torch import Tensor
 from torch.nn import Module
@@ -35,7 +35,7 @@ class FasterRcnnResnet50FpnV2(Module):
             weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT,
             num_classes=91,  # Default classes is 91, but replaced in a few lines
             weights_backbone=ResNet50_Weights.DEFAULT,
-            trainable_backbone_layers=3,
+            trainable_backbone_layers=1,
         )
 
         # Determine the number of input features for the classifier
@@ -70,7 +70,7 @@ class FasterRcnnMobileNetV3LargeFpn(Module):
             weights=FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT,
             num_classes=91,  # Default classes is 91, but replaced in a few lines
             weights_backbone=MobileNet_V3_Large_Weights.DEFAULT,
-            trainable_backbone_layers=3,
+            trainable_backbone_layers=1,
         )
 
         # Determine the number of input features for the classifier
@@ -105,7 +105,7 @@ class FasterRcnnMobileNetV3Large320Fpn(Module):
             weights=FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT,
             num_classes=91,  # Default classes is 91, but replaced in a few lines
             weights_backbone=MobileNet_V3_Large_Weights.DEFAULT,
-            trainable_backbone_layers=3,
+            trainable_backbone_layers=1,
         )
 
         # Determine the number of input features for the classifier
