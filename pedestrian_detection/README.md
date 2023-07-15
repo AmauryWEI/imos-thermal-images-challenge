@@ -97,6 +97,16 @@ the one you want by using the `-m` option:
 python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Day ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Week/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Month/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Mar_Week/ -v ../dataset/Data_Annotated_Subset_Object_Detectors/validation/ -m FasterRcnnMobileNetV3LargeFpn
 ```
 
+**Backbone Trainable Layers**
+
+By default, only the last layer of the CNN backbone is trainable. You can choose to
+change this number by using the `-tl` option:
+
+```bash
+# Train the FasterRcnnResnet50FpnV2 model with 3 backbone trainable layers
+python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Day ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Week/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Month/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Mar_Week/ -v ../dataset/Data_Annotated_Subset_Object_Detectors/validation/ -m FasterRcnnResnet50FpnV2 -tl 3
+```
+
 **Data Augmentation**
 
 By default, data augmentation is off. We recommed enabling it to obtain the best
