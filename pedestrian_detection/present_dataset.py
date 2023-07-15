@@ -41,7 +41,7 @@ parser.add_argument(
 parser.add_argument(
     "-a",
     "--augmented",
-    help="Show the augmented version of the dataset",
+    help="Show the augmented version of the dataset (all options enabled)",
     action="store_true",
     default=0,
 )
@@ -106,7 +106,9 @@ def main(args: argparse.Namespace) -> int:
     # Create a dataset from the folders
     dataset = PedestrianDataset(
         data_folders_abs_path,
-        augment=args.augmented,
+        augment_crop=args.augmented,
+        augment_distort=args.augmented,
+        augment_flip=args.augmented,
         quiet=args.quiet,
     )
 
