@@ -102,16 +102,24 @@ parser.add_argument(
     default=1e-4,
 )
 
+parser.add_argument(
+    "-tl",
+    "--trainable_layers",
+    help="Number of trainable layers in the CNN backbone",
+    type=int,
+    default=1,
+)
 
-def model_from_name(model_name: str) -> Module:
+
+def model_from_name(model_name: str, trainable_layers: int) -> Module:
     if model_name == "FasterRcnnResnet50FpnV2":
-        return FasterRcnnResnet50FpnV2()
+        return FasterRcnnResnet50FpnV2(trainable_layers)
     elif model_name == "FasterRcnnMobileNetV3LargeFpn":
-        return FasterRcnnMobileNetV3LargeFpn()
+        return FasterRcnnMobileNetV3LargeFpn(trainable_layers)
     elif model_name == "FasterRcnnMobileNetV3Large320Fpn":
-        return FasterRcnnMobileNetV3Large320Fpn()
+        return FasterRcnnMobileNetV3Large320Fpn(trainable_layers)
     elif model_name == "RetinaNetResnet50FpnV2":
-        return RetinaNetResnet50FpnV2()
+        return RetinaNetResnet50FpnV2(trainable_layers)
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
@@ -192,7 +200,7 @@ def main(args: argparse.Namespace) -> int:
         dataset = ConcatDataset([dataset, augmented_dataset])
 
     # Load a model
-    model = model_from_name(args.model).to(device)
+    model = model_from_name(args.model, args.trainable_layers).to(device)
     if not args.quiet:
         total_params, trainable_params = parameters_count(model)
         print(f"\nModel: {args.model}")
@@ -212,7 +220,7 @@ def main(args: argparse.Namespace) -> int:
         learning_rate=args.learning_rate,
         device=device,
         checkpoint=args.checkpoint,
-        model_name=args.model,
+        model_name=f"args.model_layers-{args.trainable_layers}",
     )
 
     return 0

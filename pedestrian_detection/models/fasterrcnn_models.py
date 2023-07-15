@@ -28,14 +28,14 @@ class FasterRcnnResnet50FpnV2(Module):
     Output: Temperature (float)
     """
 
-    def __init__(self):
+    def __init__(self, trainable_backbone_layers: int):
         super(FasterRcnnResnet50FpnV2, self).__init__()
 
         self.__model = fasterrcnn_resnet50_fpn_v2(
             weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT,
             num_classes=91,  # Default classes is 91, but replaced in a few lines
             weights_backbone=ResNet50_Weights.DEFAULT,
-            trainable_backbone_layers=1,
+            trainable_backbone_layers=trainable_backbone_layers,
         )
 
         # Determine the number of input features for the classifier
@@ -63,14 +63,14 @@ class FasterRcnnMobileNetV3LargeFpn(Module):
     Output: Temperature (float)
     """
 
-    def __init__(self):
+    def __init__(self, trainable_backbone_layers: int):
         super(FasterRcnnMobileNetV3LargeFpn, self).__init__()
 
         self.__model = fasterrcnn_mobilenet_v3_large_fpn(
             weights=FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT,
             num_classes=91,  # Default classes is 91, but replaced in a few lines
             weights_backbone=MobileNet_V3_Large_Weights.DEFAULT,
-            trainable_backbone_layers=1,
+            trainable_backbone_layers=trainable_backbone_layers,
         )
 
         # Determine the number of input features for the classifier
@@ -98,14 +98,14 @@ class FasterRcnnMobileNetV3Large320Fpn(Module):
     Output: Temperature (float)
     """
 
-    def __init__(self):
+    def __init__(self, trainable_backbone_layers: int):
         super(FasterRcnnMobileNetV3Large320Fpn, self).__init__()
 
         self.__model = fasterrcnn_mobilenet_v3_large_320_fpn(
             weights=FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT,
             num_classes=91,  # Default classes is 91, but replaced in a few lines
             weights_backbone=MobileNet_V3_Large_Weights.DEFAULT,
-            trainable_backbone_layers=1,
+            trainable_backbone_layers=trainable_backbone_layers,
         )
 
         # Determine the number of input features for the classifier

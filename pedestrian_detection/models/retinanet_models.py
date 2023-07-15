@@ -22,14 +22,14 @@ class RetinaNetResnet50FpnV2(Module):
     Output: Temperature (float)
     """
 
-    def __init__(self):
+    def __init__(self, trainable_backbone_layers: int):
         super(RetinaNetResnet50FpnV2, self).__init__()
 
         self.__model = retinanet_resnet50_fpn_v2(
             weights=RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT,
             num_classes=91,  # Default classes is 91, but replaced in a few lines
             weights_backbone=ResNet50_Weights.DEFAULT,
-            trainable_backbone_layers=3,
+            trainable_backbone_layers=trainable_backbone_layers,
         )
 
         # Replace the classification head to output 2 classes
