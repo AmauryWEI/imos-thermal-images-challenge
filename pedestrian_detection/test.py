@@ -111,7 +111,7 @@ def plot_loss(
 
 
 def plot_losses(model_tester: ModelTester, model_name: str) -> None:
-    losses_fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(14, 10))
+    losses_fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(14, 8))
     losses_fig.canvas.manager.set_window_title(f"{model_name} - Training Losses")
 
     all_training_losses = np.empty((0, 5))
