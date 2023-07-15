@@ -38,6 +38,9 @@ class ThermalDataset(Dataset):
     Class (inherting from Pytorch's Dataset) representing a dataset to use for the
     thermal prediction challenge. Each item is composed of an image (grayscale or RGB),
     its normalized metadata, and the ground truth temperature (in degrees Celsius).
+
+    The images will be randomly flipped vertically and/or horizontally to improve
+    generalization of the model during training.
     """
 
     def __init__(
