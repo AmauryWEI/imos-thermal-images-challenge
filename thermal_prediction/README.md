@@ -29,8 +29,8 @@ Some of the images will be randomly flipped horizontally and/or vertically, whic
 random transformation applied to all images.
 
 <p float="left">
-    <img src="./doc/example_metadata_distribution.png" height="280px" alt="Training set metadata distribution">
-    <img src="./doc/example_temperature_distribution.png" height="280px" alt="Training set temperature distribution">
+    <img src="./doc/example_metadata_distribution.png" height="290px" alt="Training set metadata distribution">
+    <img src="./doc/example_temperature_distribution.png" height="290px" alt="Training set temperature distribution">
 </p>
 
 <p float="left">
@@ -141,7 +141,7 @@ images will also be shown, with the temperature prediction and ground truth abov
 images.
 
 <p float="left">
-    <img src="./doc/example_loss_graph.png" width="400px" alt="Training and validation loss graphs">
+    <img src="./doc/example_loss_graph.png" width="600px" alt="Training and validation loss graphs">
 </p>
 
 Here is an example of the MSE and MAE metrics produced by the [`test.py`](./test.py) 
