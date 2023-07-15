@@ -97,7 +97,7 @@ parser.add_argument(
 parser.add_argument(
     "-lr",
     "--learning_rate",
-    help="Learning rate (for Adam optimizer)",
+    help="Learning rate (for AdamW optimizer)",
     type=float,
     default=1e-4,
 )
