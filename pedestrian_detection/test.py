@@ -25,6 +25,7 @@ from fasterrcnn_models import (
     FasterRcnnMobileNetV3LargeFpn,
     FasterRcnnMobileNetV3Large320Fpn,
 )
+from retinanet_models import RetinaNetResnet50FpnV2
 from model_trainer import parameters_count
 from model_tester import ModelTester
 
@@ -214,11 +215,13 @@ def show_random_images_with_predictions(
 
 def model_from_name(model_name: str) -> Module:
     if model_name == "FasterRcnnResnet50FpnV2":
-        return FasterRcnnResnet50FpnV2()
+        return FasterRcnnResnet50FpnV2(1)
     elif model_name == "FasterRcnnMobileNetV3LargeFpn":
-        return FasterRcnnMobileNetV3LargeFpn()
+        return FasterRcnnMobileNetV3LargeFpn(1)
     elif model_name == "FasterRcnnMobileNetV3Large320Fpn":
-        return FasterRcnnMobileNetV3Large320Fpn()
+        return FasterRcnnMobileNetV3Large320Fpn(1)
+    elif model_name == "RetinaNetResnet50FpnV2":
+        return RetinaNetResnet50FpnV2(1)
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
