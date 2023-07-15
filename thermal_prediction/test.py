@@ -134,14 +134,14 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
 
     textbox_contents = "\n".join(
         (
-            f"Last Training MSE Loss    = {mean_training_loss_per_epoch[-1]:.2f}",
-            f"Last Validation MSE Loss = {mean_validation_loss_per_epoch[-1]:.2f}",
+            f"Last Training MSE Loss    = {mean_training_loss_per_epoch[-1]:.3f}",
+            f"Last Validation MSE Loss = {mean_validation_loss_per_epoch[-1]:.3f}",
         )
     )
     props = dict(boxstyle="round", facecolor="white", alpha=0.5)
     # Place a text box in bottom left in axes coords
     ax.text(
-        0.82,
+        0.8,
         0.9,
         textbox_contents,
         transform=ax.transAxes,

@@ -118,8 +118,8 @@ class ModelTester:
                 self.__testing_mae_losses.append(mae_loss.item())
 
             # Print mean performance for this round
-            print(f"ModelTester: Mean MSE loss {mean(self.__testing_mse_losses):.2f}")
-            print(f"ModelTester: Mean MAE loss {mean(self.__testing_mae_losses):.2f}")
+            print(f"ModelTester: Mean MSE loss {mean(self.__testing_mse_losses):.4f}")
+            print(f"ModelTester: Mean MAE loss {mean(self.__testing_mae_losses):.4f}")
 
             # Stack the prediction and save as numpy file
             if self.__save_predictions:
