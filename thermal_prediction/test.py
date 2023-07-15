@@ -116,7 +116,10 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
     mean_training_loss_per_epoch = np.mean(training_losses, axis=1)
     validation_losses = np.array(model_tester.validation_losses)
     mean_validation_loss_per_epoch = np.mean(validation_losses, axis=1)
-    max_loss = max(np.amax(training_losses), np.amax(validation_losses))
+    max_loss = max(
+        np.amax(mean_training_loss_per_epoch),
+        np.amax(mean_validation_loss_per_epoch),
+    )
 
     textbox_contents = "\n".join(
         (
@@ -148,10 +151,8 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
 
     # Format the plot
     ax.legend()
-    ax.set_ylim([0, max_loss + 1])
+    ax.set_ylim([0, 1.1 * max_loss])
     ax.set_xlim([0, len(mean_training_loss_per_epoch) - 1])
-    ax2.set_ylim([0, max_loss + 1])
-    ax3.set_ylim([0, max_loss + 1])
     ax2.set_xlim([0, len(training_losses.flatten()) - 1])
     ax3.set_xlim([0, len(validation_losses.flatten()) - 1])
     ax2.set_xticklabels([])
