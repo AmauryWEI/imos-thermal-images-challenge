@@ -220,18 +220,20 @@ class ModelTrainer:
                 loss_box_reg = loss_dict["loss_box_reg"].item()
                 loss_objectness = loss_dict["loss_objectness"].item()
                 loss_rpn_box_reg = loss_dict["loss_rpn_box_reg"].item()
-                if (
-                    np.isnan(loss_classifier)
-                    or np.isnan(loss_box_reg)
-                    or np.isnan(loss_objectness)
-                    or np.isnan(loss_rpn_box_reg)
-                ):
-                    raise RuntimeError("NaN loss during training")
             else:
                 loss_classifier = loss_dict["classification"].item()
                 loss_box_reg = loss_dict["bbox_regression"].item()
                 loss_objectness = 0
                 loss_rpn_box_reg = 0
+
+            # Check if the losses are NaN, indicating issues with the gradient
+            if (
+                np.isnan(loss_classifier)
+                or np.isnan(loss_box_reg)
+                or np.isnan(loss_objectness)
+                or np.isnan(loss_rpn_box_reg)
+            ):
+                raise RuntimeError("NaN loss during training")
 
             # Update the global losses array
             losses = np.vstack(
