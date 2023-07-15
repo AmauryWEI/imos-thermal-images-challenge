@@ -79,7 +79,7 @@ parser.add_argument(
     "--model",
     help="Model to use",
     type=str,
-    default="sample_model",
+    default="ResNet50",
 )
 
 parser.add_argument(
