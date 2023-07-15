@@ -28,7 +28,11 @@ from resnet_models import (
 )
 from cnn_models import CnnModel
 from mlp_models import MlpModel, MlpModelDateTime
-from mobilenet_models import MobileNetV3Small_RgbNoMetadata
+from mobilenet_models import (
+    MobileNetV3Small_RgbNoMetadata,
+    MobileNetV3Small_RgbMetadata,
+    MobileNetV3Small_RgbMetadataMlp,
+)
 from model_trainer import parameters_count
 from model_tester import ModelTester
 
@@ -41,6 +45,8 @@ RGB_MODELS = [
     "ResNet18Metadata",
     "ResNet18MetadataMlp",
     "MobileNetV3Small",
+    "MobileNetV3SmallMetadata",
+    "MobileNetV3SmallMetadataMlp",
 ]
 
 # Define the arguments/options of the script
@@ -112,6 +118,9 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
         f"{model_name} - Training & Validation Losses"
     )
 
+    print(len(model_tester.training_losses[0]))
+    # print(len(model_tester.training_losses[10]))
+
     training_losses = np.array(model_tester.training_losses)
     mean_training_loss_per_epoch = np.mean(training_losses, axis=1)
     validation_losses = np.array(model_tester.validation_losses)
@@ -130,8 +139,8 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
     props = dict(boxstyle="round", facecolor="white", alpha=0.5)
     # Place a text box in bottom left in axes coords
     ax.text(
-        0.02,
-        0.1,
+        0.82,
+        0.9,
         textbox_contents,
         transform=ax.transAxes,
         fontsize=10,
@@ -189,6 +198,10 @@ def model_from_name(model_name: str) -> Module:
         return ResNet18_RgbNoMetadata()
     elif model_name == "MobileNetV3Small":
         return MobileNetV3Small_RgbNoMetadata()
+    elif model_name == "MobileNetV3SmallMetadata":
+        return MobileNetV3Small_RgbMetadata()
+    elif model_name == "MobileNetV3SmallMetadataMlp":
+        return MobileNetV3Small_RgbMetadataMlp()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 
