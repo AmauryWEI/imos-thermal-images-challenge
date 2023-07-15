@@ -82,7 +82,7 @@ unless you have a very large GPU VRAM budget. Here is an example with batch size
 15 epochs:
 
 ```bash
-# Train the FasterRcnnResnet50FpnV2 model with batch size 2 afor 15 epochs
+# Train the FasterRcnnResnet50FpnV2 model with batch size 2 for 15 epochs
 python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Day ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Week/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Month/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Mar_Week/ -v ../dataset/Data_Annotated_Subset_Object_Detectors/validation/ -b 2 -e 15
 ```
 
