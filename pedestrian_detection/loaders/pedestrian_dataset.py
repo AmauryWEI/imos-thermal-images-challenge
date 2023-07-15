@@ -22,7 +22,9 @@ class PedestrianDataset(Dataset):
     def __init__(
         self,
         data_folders: list[str],
-        augment: bool = False,
+        augment_crop: bool = False,
+        augment_distort: bool = False,
+        augment_flip: bool = False,
         quiet: bool = False,
     ) -> None:
         """
@@ -42,7 +44,9 @@ class PedestrianDataset(Dataset):
         """
         self.__data_folders = data_folders
         self.__quiet = quiet
-        self.__augment = augment
+        self.__augment_distort = augment_distort
+        self.__augment_crop = augment_crop
+        self.__augment_flip = augment_flip
 
         # List of the absolute paths of all images
         self.__images_abs_path = []
@@ -198,7 +202,7 @@ class PedestrianDataset(Dataset):
         image = self.__fetch_image_as_tensor(index).float()
         target = self.__targets[index]
 
-        if self.__augment:
+        if self.__augment_crop or self.__augment_distort or self.__augment_flip:
             # Compute bounding boxes as datapoints
             bboxes = datapoints.BoundingBox(
                 target["boxes"],
@@ -207,9 +211,14 @@ class PedestrianDataset(Dataset):
             )
 
             # Perform transformation
-            image, bboxes, labels = AUGMENTATION_TRANSFORM(
-                image, bboxes, target["labels"]
-            )
+            if self.__augment_crop:
+                image, bboxes, labels = CROP_TRANSFORM(image, bboxes, target["labels"])
+            if self.__augment_distort:
+                image, bboxes, labels = DISTORT_TRANSFORM(
+                    image, bboxes, target["labels"]
+                )
+            if self.__augment_flip:
+                image, bboxes, labels = FLIP_TRANSFORM(image, bboxes, target["labels"])
 
             # Remove bounding boxes which have the same x1 x2 or y1 y2
             bboxes_idx_to_keep = []
@@ -270,10 +279,10 @@ def ltd_annotation_to_pytorch_target(annotation: list[float]) -> tuple[Tensor, T
     )
 
 
-AUGMENTATION_TRANSFORM = transforms.Compose(
+DISTORT_TRANSFORM = transforms.RandomPhotometricDistort()
+CROP_TRANSFORM = transforms.RandomIoUCrop()
+FLIP_TRANSFORM = transforms.Compose(
     [
-        transforms.RandomPhotometricDistort(),
-        transforms.RandomIoUCrop(),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
     ]
