@@ -25,6 +25,8 @@ from resnet_models import (
     ResNet50_RgbMetadata,
     ResNet50_RgbMetadataMlp,
     ResNet18_RgbNoMetadata,
+    ResNet18_RgbMetadata,
+    ResNet18_RgbMetadataMlp,
 )
 from cnn_models import CnnModel
 from mlp_models import MlpModel, MlpModelDateTime
@@ -196,6 +198,10 @@ def model_from_name(model_name: str) -> Module:
         return ResNet50_RgbMetadataMlp()
     elif model_name == "ResNet18":
         return ResNet18_RgbNoMetadata()
+    elif model_name == "ResNet18Metadata":
+        return ResNet18_RgbMetadata()
+    elif model_name == "ResNet18MetadataMlp":
+        return ResNet18_RgbMetadataMlp()
     elif model_name == "MobileNetV3Small":
         return MobileNetV3Small_RgbNoMetadata()
     elif model_name == "MobileNetV3SmallMetadata":
