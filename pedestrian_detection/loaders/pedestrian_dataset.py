@@ -11,6 +11,9 @@ from torch import Tensor, tensor
 from torch.utils.data import Dataset
 from torchvision.io import read_image, ImageReadMode
 from torchvision import datapoints
+import torchvision
+
+torchvision.disable_beta_transforms_warning()
 import torchvision.transforms.v2 as transforms
 from torchvision.transforms.v2 import functional as F
 
