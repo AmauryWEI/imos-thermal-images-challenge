@@ -25,6 +25,11 @@ from fasterrcnn_models import (
 from retinanet_models import RetinaNetResnet50FpnV2
 from model_trainer import ModelTrainer, parameters_count
 
+DISTORT_TRANSFORM = "distort"
+CROP_TRANSFORM = "crop"
+FLIP_TRANSFORM = "flip"
+SUPPORTED_AUGMENTATION_TRANSFORMS = [DISTORT_TRANSFORM, CROP_TRANSFORM, FLIP_TRANSFORM]
+
 # Define the arguments/options of the script
 parser = argparse.ArgumentParser()
 
@@ -65,9 +70,9 @@ parser.add_argument(
 parser.add_argument(
     "-a",
     "--augment",
-    help="Augment the dataset",
-    action="store_true",
-    default=0,
+    help="Specify the dataset augmentation strategy with options: ['flip', 'crop', 'distort']",
+    default="",
+    type=str,
 )
 
 parser.add_argument(
@@ -109,6 +114,43 @@ parser.add_argument(
     type=int,
     default=1,
 )
+
+
+def parse_augmentation_options(options: str) -> tuple[bool, bool, bool]:
+    """
+    Parse the 3 data augmentation options (crop, distort, flip)
+
+    Parameters
+    ----------
+    options : str
+        String passed as command line argument
+
+    Returns
+    -------
+    tuple[bool, bool, bool]
+        Augment crop, Augment distort, Augment flip
+    """
+    if options == "":
+        return False, False, False
+
+    augment_crop = False
+    augment_distort = False
+    augment_flip = False
+
+    individual_options = options.split(",")
+    for option in individual_options:
+        if option not in SUPPORTED_AUGMENTATION_TRANSFORMS:
+            raise ValueError(
+                f"Unknown augmentation option {option} ; must be one of {SUPPORTED_AUGMENTATION_TRANSFORMS}"
+            )
+        if option == CROP_TRANSFORM:
+            augment_crop = True
+        elif option == DISTORT_TRANSFORM:
+            augment_distort = True
+        elif option == FLIP_TRANSFORM:
+            augment_flip = True
+
+    return augment_crop, augment_distort, augment_flip
 
 
 def model_from_name(model_name: str, trainable_layers: int) -> Module:
@@ -158,9 +200,18 @@ def main(args: argparse.Namespace) -> int:
     elif torch.cuda.is_available():
         device = torch.device("cuda")
 
+    # Obtain the different augmentation flags from the scripts' arguments
+    augment_crop, augment_distort, augment_flip = parse_augmentation_options(
+        args.augment
+    )
+
     if not args.quiet:
         print(f"Data folders ({len(args.data_folders)}): {args.data_folders}")
         print(f"Validation folder: {args.validation}")
+        print(
+            f"Augmentation option: crop={augment_crop}, distort={augment_distort}, "
+            f"flip={augment_flip}"
+        )
 
     # Make sure each folder exists
     data_folders_abs_path = [path.abspath(f) for f in args.data_folders]
@@ -191,10 +242,12 @@ def main(args: argparse.Namespace) -> int:
     )
 
     # Perform data augmentation
-    if args.augment:
+    if augment_crop or augment_distort or augment_flip:
         augmented_dataset = PedestrianDataset(
             data_folders_abs_path,
-            augment=True,
+            augment_crop=augment_crop,
+            augment_distort=augment_distort,
+            augment_flip=augment_flip,
             quiet=args.quiet,
         )
         dataset = ConcatDataset([dataset, augmented_dataset])
@@ -210,6 +263,18 @@ def main(args: argparse.Namespace) -> int:
         )
         print(model)
 
+    # Get the full model name
+    full_model_name = f"{args.model}_layers-{args.trainable_layers}"
+    if augment_crop:
+        full_model_name = full_model_name + "_crop"
+    if augment_distort:
+        full_model_name = full_model_name + "_distort"
+    if augment_flip:
+        full_model_name = full_model_name + "_flip"
+
+    if not args.quiet:
+        print(f"Full model name: {full_model_name}")
+
     # Train the model
     train(
         dataset,
@@ -220,7 +285,7 @@ def main(args: argparse.Namespace) -> int:
         learning_rate=args.learning_rate,
         device=device,
         checkpoint=args.checkpoint,
-        model_name=f"args.model_layers-{args.trainable_layers}",
+        model_name=full_model_name,
     )
 
     return 0
