@@ -6,14 +6,14 @@ This folder contains source code tackling the Challenge #2 about pedestrian dete
 
 ## Usage Instructions
 
-There are 3 simple entry points to use this part of the repository: 
-[`present_dataset.py`](./present_dataset.py), [`train.py`](./train.py) and 
+There are 3 simple entry points to use this part of the repository:
+[`present_dataset.py`](./present_dataset.py), [`train.py`](./train.py) and
 [`test.py`](./test.py).
 
 ### Dataset Presentation
 
-To visualize some random images in the dataset, use the 
-[`present_dataset.py`](./present_dataset.py) script and pass the data folders you want 
+To visualize some random images in the dataset, use the
+[`present_dataset.py`](./present_dataset.py) script and pass the data folders you want
 to visualize:
 
 ```bash
@@ -41,7 +41,7 @@ python present_dataset.py ../dataset/Data_Annotated_Subset_Object_Detectors/trai
 
 ### Training
 
-To train a network, run the [`train.py`](./train.py) script with the appropriate 
+To train a network, run the [`train.py`](./train.py) script with the appropriate
 arguments and options.
 
 **Help Message**
@@ -56,7 +56,7 @@ python train.py --help
 **Standard Usage**
 
 Train the default network (FasterRcnnResnet50FpnV2) by passing the data folders that you
-want to train the network on. 80% of the data will go for training, the other 20% for 
+want to train the network on. 80% of the data will go for training, the other 20% for
 validation:
 
 ```bash
@@ -66,7 +66,7 @@ python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_D
 
 **Custom Validation Set**
 
-You can also pass a custom validation set, which is already provided in the 
+You can also pass a custom validation set, which is already provided in the
 "Data_Annotated_Subset_Object_Detectors":
 
 ```bash
@@ -88,7 +88,7 @@ python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_D
 
 **Model Choice**
 
-Different models are supported: `FasterRcnnResnet50FpnV2`, 
+Different models are supported: `FasterRcnnResnet50FpnV2`,
 `FasterRcnnMobileNetV3LargeFpn`, and `FasterRcnnMobileNetV3Large320Fpn`. You can choose
 the one you want by using the `-m` option:
 
@@ -99,7 +99,7 @@ python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_D
 
 **Data Augmentation**
 
-By default, data augmentation is off. We recommed enabling it to obtain the best 
+By default, data augmentation is off. We recommed enabling it to obtain the best
 performance. To do so, use the `-a` option. This will create a duplicate of the training
 set with random photometric distortion, cropping, vertical and horizontal flipping.
 
@@ -114,7 +114,6 @@ Finally, you can load an existing checkpoint model and keep training on it. To d
 pass the checkpoint file (must be the same model as you want to re-train) using the `-c`
 option. Here is an example where the model will be train for 5 more epochs:
 
-
 ```bash
 # Train the FasterRcnnResnet50FpnV2 model for an additional 5 epochs
 python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Day ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Week/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_Month/ ../dataset/Data_Annotated_Subset_Object_Detectors/training/Mar_Week/ -v ../dataset/Data_Annotated_Subset_Object_Detectors/validation/ -c ./checkpoints/FasterRcnnResnet50FpnV2_epoch-9.pt -e 5
@@ -122,7 +121,7 @@ python train.py ../dataset/Data_Annotated_Subset_Object_Detectors/training/Feb_D
 
 ### Testing
 
-To test a network, run the [`test.py`](./test.py) script with the appropriate 
+To test a network, run the [`test.py`](./test.py) script with the appropriate
 arguments and options.
 
 **Help Message**
@@ -136,7 +135,7 @@ python test.py --help
 
 **Standard Usage**
 
-Test a network by passing the location of the test set, the model name, and the 
+Test a network by passing the location of the test set, the model name, and the
 checkpoint file:
 
 ```bash
@@ -144,9 +143,9 @@ checkpoint file:
 python test.py ../dataset/Data_Annotated_Subset_Object_Detectors/testing/Apr_Month ../dataset/Data_Annotated_Subset_Object_Detectors/testing/Aug_Month/ ../dataset/Data_Annotated_Subset_Object_Detectors/testing/Jan_Month/ -m FasterRcnnResnet50FpnV2 -c ./checkpoints/FasterRcnnResnet50FpnV2_epoch-9.pt
 ```
 
-The script will first plot the different losses of the training (stored within the 
+The script will first plot the different losses of the training (stored within the
 checkpoint file). To move on to the testing phase, close the graph (by pressing on "q"
-or closing the window). After the testing phase, the mean Average Precision (mAP) 
+or closing the window). After the testing phase, the mean Average Precision (mAP)
 metrics will be logged in the terminal. Multiple random test images will also be shown,
 with the ground truth bouding boxes in green, and the predictions in red.
 
@@ -155,8 +154,8 @@ with the ground truth bouding boxes in green, and the predictions in red.
     <img src="./doc/example_test_images.png" height="300px" alt="Test images with predictions">
 </p>
 
-
 Here is an example of the mAP metrics produced by the [`test.py`](./test.py) script:
+
 ```txt
 IoU metric: bbox
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.352
