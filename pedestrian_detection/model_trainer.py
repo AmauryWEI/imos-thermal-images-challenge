@@ -9,7 +9,7 @@ import sys
 import numpy as np
 from tqdm import tqdm
 import torch
-from torch.optim import Adam
+from torch.optim.adamw import AdamW
 from torch.nn import Module
 from torch.utils.data import Dataset, DataLoader, Subset, random_split
 from torchvision.ops import nms
@@ -58,7 +58,7 @@ class ModelTrainer:
         self.__batch_size = batch_size
         self.__workers_count = workers_count
 
-        self.__optimizer = Adam(model.parameters(), lr=learning_rate)
+        self.__optimizer = AdamW(model.parameters(), lr=learning_rate)
 
         self.__epoch = 0
         self.__train_data_loader = None
@@ -220,6 +220,13 @@ class ModelTrainer:
                 loss_box_reg = loss_dict["loss_box_reg"].item()
                 loss_objectness = loss_dict["loss_objectness"].item()
                 loss_rpn_box_reg = loss_dict["loss_rpn_box_reg"].item()
+                if (
+                    np.isnan(loss_classifier)
+                    or np.isnan(loss_box_reg)
+                    or np.isnan(loss_objectness)
+                    or np.isnan(loss_rpn_box_reg)
+                ):
+                    raise RuntimeError("NaN loss during training")
             else:
                 loss_classifier = loss_dict["classification"].item()
                 loss_box_reg = loss_dict["bbox_regression"].item()
