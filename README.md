@@ -90,3 +90,18 @@ build and install it:
     python setup.py build
     python setup.py install
     ```
+
+### Facig a "Too many open files" exception
+
+The root cause behind this exception is not clear. With two separate machines
+running Ubuntu 20.04.6 LTS, one suffers from this issue and the other does not.
+This problem is discussed in 
+the [GitHub issue #11201](https://github.com/pytorch/pytorch/issues/11201) on 
+the `pytorch` repository.
+
+To mitigate the issue, you can add the following line at the beginning of the 
+`main()` function in the `train.py` scripts:
+
+```python
+torch.multiprocessing.set_sharing_strategy('file_system')
+```
