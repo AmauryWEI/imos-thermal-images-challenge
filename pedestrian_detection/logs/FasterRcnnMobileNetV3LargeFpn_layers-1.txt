@@ -1,0 +1,767 @@
+Model: FasterRcnnMobileNetV3LargeFpn
+Parameters: 18930229 ; Trainable: 16136277 (85.2408 [%])
+
+FasterRcnnMobileNetV3LargeFpn(
+  (_FasterRcnnMobileNetV3LargeFpn__model): FasterRCNN(
+    (transform): GeneralizedRCNNTransform(
+        Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        Resize(min_size=(800,), max_size=1333, mode='bilinear')
+    )
+    (backbone): BackboneWithFPN(
+      (body): IntermediateLayerGetter(
+        (0): Conv2dNormActivation(
+          (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+          (1): FrozenBatchNorm2d(16, eps=1e-05)
+          (2): Hardswish()
+        )
+        (1): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16, bias=False)
+              (1): FrozenBatchNorm2d(16, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(16, eps=1e-05)
+            )
+          )
+        )
+        (2): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(64, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=64, bias=False)
+              (1): FrozenBatchNorm2d(64, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (2): Conv2dNormActivation(
+              (0): Conv2d(64, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(24, eps=1e-05)
+            )
+          )
+        )
+        (3): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(72, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+              (1): FrozenBatchNorm2d(72, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (2): Conv2dNormActivation(
+              (0): Conv2d(72, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(24, eps=1e-05)
+            )
+          )
+        )
+        (4): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(72, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(72, 72, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=72, bias=False)
+              (1): FrozenBatchNorm2d(72, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(72, 24, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(72, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(40, eps=1e-05)
+            )
+          )
+        )
+        (5): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(120, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+              (1): FrozenBatchNorm2d(120, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(120, 32, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(32, 120, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(40, eps=1e-05)
+            )
+          )
+        )
+        (6): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(120, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+              (1): FrozenBatchNorm2d(120, eps=1e-05)
+              (2): ReLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(120, 32, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(32, 120, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(40, eps=1e-05)
+            )
+          )
+        )
+        (7): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(40, 240, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(240, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(240, 240, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=240, bias=False)
+              (1): FrozenBatchNorm2d(240, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): Conv2dNormActivation(
+              (0): Conv2d(240, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(80, eps=1e-05)
+            )
+          )
+        )
+        (8): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(80, 200, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(200, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(200, 200, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=200, bias=False)
+              (1): FrozenBatchNorm2d(200, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): Conv2dNormActivation(
+              (0): Conv2d(200, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(80, eps=1e-05)
+            )
+          )
+        )
+        (9): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(184, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=184, bias=False)
+              (1): FrozenBatchNorm2d(184, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): Conv2dNormActivation(
+              (0): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(80, eps=1e-05)
+            )
+          )
+        )
+        (10): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(184, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=184, bias=False)
+              (1): FrozenBatchNorm2d(184, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): Conv2dNormActivation(
+              (0): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(80, eps=1e-05)
+            )
+          )
+        )
+        (11): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(80, 480, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(480, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(480, 480, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=480, bias=False)
+              (1): FrozenBatchNorm2d(480, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(480, 120, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(120, 480, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(480, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(112, eps=1e-05)
+            )
+          )
+        )
+        (12): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(672, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(672, 672, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=672, bias=False)
+              (1): FrozenBatchNorm2d(672, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(672, 168, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(168, 672, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(672, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(112, eps=1e-05)
+            )
+          )
+        )
+        (13): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(672, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(672, 672, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=672, bias=False)
+              (1): FrozenBatchNorm2d(672, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(672, 168, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(168, 672, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(672, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(160, eps=1e-05)
+            )
+          )
+        )
+        (14): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(960, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=960, bias=False)
+              (1): FrozenBatchNorm2d(960, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(960, 240, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(240, 960, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(160, eps=1e-05)
+            )
+          )
+        )
+        (15): InvertedResidual(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(960, eps=1e-05)
+              (2): Hardswish()
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=960, bias=False)
+              (1): FrozenBatchNorm2d(960, eps=1e-05)
+              (2): Hardswish()
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(960, 240, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(240, 960, kernel_size=(1, 1), stride=(1, 1))
+              (activation): ReLU()
+              (scale_activation): Hardsigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): FrozenBatchNorm2d(160, eps=1e-05)
+            )
+          )
+        )
+        (16): Conv2dNormActivation(
+          (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): FrozenBatchNorm2d(960, eps=1e-05)
+          (2): Hardswish()
+        )
+      )
+      (fpn): FeaturePyramidNetwork(
+        (inner_blocks): ModuleList(
+          (0): Conv2dNormActivation(
+            (0): Conv2d(160, 256, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (1): Conv2dNormActivation(
+            (0): Conv2d(960, 256, kernel_size=(1, 1), stride=(1, 1))
+          )
+        )
+        (layer_blocks): ModuleList(
+          (0-1): 2 x Conv2dNormActivation(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          )
+        )
+        (extra_blocks): LastLevelMaxPool()
+      )
+    )
+    (rpn): RegionProposalNetwork(
+      (anchor_generator): AnchorGenerator()
+      (head): RPNHead(
+        (conv): Sequential(
+          (0): Conv2dNormActivation(
+            (0): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+            (1): ReLU(inplace=True)
+          )
+        )
+        (cls_logits): Conv2d(256, 15, kernel_size=(1, 1), stride=(1, 1))
+        (bbox_pred): Conv2d(256, 60, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (roi_heads): RoIHeads(
+      (box_roi_pool): MultiScaleRoIAlign(featmap_names=['0', '1', '2', '3'], output_size=(7, 7), sampling_ratio=2)
+      (box_head): TwoMLPHead(
+        (fc6): Linear(in_features=12544, out_features=1024, bias=True)
+        (fc7): Linear(in_features=1024, out_features=1024, bias=True)
+      )
+      (box_predictor): FastRCNNPredictor(
+        (cls_score): Linear(in_features=1024, out_features=2, bias=True)
+        (bbox_pred): Linear(in_features=1024, out_features=8, bias=True)
+      )
+    )
+  )
+)
+
+Full model name: FasterRcnnMobileNetV3LargeFpn_layers-1
+Epoch 0: Combined loss 0.4627 ; Classification loss 0.1886 ; Localization loss 0.2421 ; Objectness loss 0.0194 ; Region Proposal loss 0.0126
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.214
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.538
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.152
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.182
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.528
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.084
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.247
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.276
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.249
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.570
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 1: Combined loss 0.5776 ; Classification loss 0.2247 ; Localization loss 0.3340 ; Objectness loss 0.0087 ; Region Proposal loss 0.0102
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.229
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.538
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.169
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.206
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.479
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.086
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.268
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.292
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.269
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.546
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 2: Combined loss 0.6167 ; Classification loss 0.2416 ; Localization loss 0.3595 ; Objectness loss 0.0069 ; Region Proposal loss 0.0087
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.253
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.598
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.204
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.222
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.539
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.087
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.282
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.309
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.285
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.573
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 3: Combined loss 0.6241 ; Classification loss 0.2442 ; Localization loss 0.3641 ; Objectness loss 0.0072 ; Region Proposal loss 0.0086
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.224
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.539
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.136
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.197
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.488
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.082
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.260
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.290
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.265
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.570
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 4: Combined loss 0.5843 ; Classification loss 0.2228 ; Localization loss 0.3454 ; Objectness loss 0.0072 ; Region Proposal loss 0.0089
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.249
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.581
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.192
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.223
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.522
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.088
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.288
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.313
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.288
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.589
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 5: Combined loss 0.6938 ; Classification loss 0.2600 ; Localization loss 0.4209 ; Objectness loss 0.0050 ; Region Proposal loss 0.0078
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.272
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.613
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.213
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.244
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.549
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.094
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.300
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.328
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.302
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.603
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 6: Combined loss 0.7497 ; Classification loss 0.2750 ; Localization loss 0.4617 ; Objectness loss 0.0055 ; Region Proposal loss 0.0075
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.264
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.596
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.194
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.230
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.588
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.089
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.285
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.320
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.291
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.632
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 7: Combined loss 0.6785 ; Classification loss 0.2443 ; Localization loss 0.4212 ; Objectness loss 0.0055 ; Region Proposal loss 0.0075
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.290
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.635
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.254
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.258
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.589
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.098
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.312
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.346
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.321
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 8: Combined loss 0.7080 ; Classification loss 0.2633 ; Localization loss 0.4328 ; Objectness loss 0.0048 ; Region Proposal loss 0.0072
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.254
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.555
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.194
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.222
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.562
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.086
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.286
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.320
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.294
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.600
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 9: Combined loss 0.7174 ; Classification loss 0.2636 ; Localization loss 0.4397 ; Objectness loss 0.0059 ; Region Proposal loss 0.0081
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.298
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.631
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.257
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.260
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.639
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.096
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.317
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.354
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.326
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.662
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 10: Combined loss 0.7586 ; Classification loss 0.2679 ; Localization loss 0.4791 ; Objectness loss 0.0044 ; Region Proposal loss 0.0072
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.302
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.652
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.273
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.269
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.604
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.100
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.319
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.354
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.328
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.627
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 11: Combined loss 0.7426 ; Classification loss 0.2632 ; Localization loss 0.4689 ; Objectness loss 0.0037 ; Region Proposal loss 0.0068
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.282
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.621
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.207
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.246
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.621
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.093
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.309
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.342
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.311
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.673
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 12: Combined loss 0.8252 ; Classification loss 0.2949 ; Localization loss 0.5209 ; Objectness loss 0.0031 ; Region Proposal loss 0.0063
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.290
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.631
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.235
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.258
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.588
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.092
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.316
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.346
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.321
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.611
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 13: Combined loss 0.7964 ; Classification loss 0.2829 ; Localization loss 0.5034 ; Objectness loss 0.0036 ; Region Proposal loss 0.0065
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.315
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.660
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.300
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.283
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.632
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.104
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.331
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.365
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.337
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.670
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 14: Combined loss 0.7193 ; Classification loss 0.2500 ; Localization loss 0.4592 ; Objectness loss 0.0040 ; Region Proposal loss 0.0062
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.291
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.632
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.253
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.262
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.592
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.098
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.313
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.349
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.321
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.649
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 15: Combined loss 0.7676 ; Classification loss 0.2702 ; Localization loss 0.4870 ; Objectness loss 0.0037 ; Region Proposal loss 0.0067
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.300
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.663
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.250
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.272
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.578
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.101
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.323
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.362
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.336
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.641
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 16: Combined loss 0.8484 ; Classification loss 0.2869 ; Localization loss 0.5519 ; Objectness loss 0.0033 ; Region Proposal loss 0.0064
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.286
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.635
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.231
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.249
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.621
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.094
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.301
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.335
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.306
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.646
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 17: Combined loss 0.7526 ; Classification loss 0.2573 ; Localization loss 0.4855 ; Objectness loss 0.0035 ; Region Proposal loss 0.0062
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.295
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.654
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.245
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.264
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.607
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.095
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.316
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.352
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.324
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.657
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+
+Epoch 18: Combined loss 0.8085 ; Classification loss 0.2754 ; Localization loss 0.5237 ; Objectness loss 0.0032 ; Region Proposal loss 0.0063
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.305
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.666
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.273
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.274
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.601
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.102
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.324
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.356
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.331
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.627
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ 
+Epoch 19: Combined loss 0.8639 ; Classification loss 0.2982 ; Localization loss 0.5566 ; Objectness loss 0.0029 ; Region Proposal loss 0.0062
+creating index...
+index created!
+Accumulating evaluation results...
+DONE (t=0.01s).
+IoU metric: bbox
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.314
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.661
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.283
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.281
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.626
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.104
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.323
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.365
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.339
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.651
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = -1.000
