@@ -120,9 +120,6 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
         f"{model_name} - Training & Validation Losses"
     )
 
-    print(len(model_tester.training_losses[0]))
-    # print(len(model_tester.training_losses[10]))
-
     training_losses = np.array(model_tester.training_losses)
     mean_training_loss_per_epoch = np.mean(training_losses, axis=1)
     validation_losses = np.array(model_tester.validation_losses)
