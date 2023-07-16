@@ -105,3 +105,10 @@ To mitigate the issue, you can add the following line at the beginning of the
 ```python
 torch.multiprocessing.set_sharing_strategy('file_system')
 ```
+
+### Facing a "NaN loss during training" exception
+
+This issue might happen when training the Faster R-CNN MobileNetV3 networks with
+multiple trainable layers, a small batch size, and a large learning rate. Try to
+reduce the number of trainable layers (between 0 and 2), use a larger batch size
+(*e.g.* 4, 8, 16, ...), and reduce the learning rate (*e.g.* 4e-5).
