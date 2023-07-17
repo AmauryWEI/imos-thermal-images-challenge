@@ -38,10 +38,18 @@ parser.add_argument(
     default=0,
 )
 
+parser.add_argument(
+    "-a",
+    "--augmented",
+    help="Show the augmented version of the dataset (all options enabled)",
+    action="store_true",
+    default=0,
+)
+
 
 def show_random_images(dataset: PedestrianDataset) -> None:
     """
-    Show multiple random images of the dataset
+    Show multiple random images of the dataset with their annotations (bounding boxes)
 
     Parameters
     ----------
@@ -96,7 +104,13 @@ def main(args: argparse.Namespace) -> int:
             return 1
 
     # Create a dataset from the folders
-    dataset = PedestrianDataset(data_folders_abs_path, quiet=args.quiet)
+    dataset = PedestrianDataset(
+        data_folders_abs_path,
+        augment_crop=args.augmented,
+        augment_distort=args.augmented,
+        augment_flip=args.augmented,
+        quiet=args.quiet,
+    )
 
     show_random_images(dataset)
     plt.show()

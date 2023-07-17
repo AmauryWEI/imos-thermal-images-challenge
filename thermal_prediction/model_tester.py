@@ -13,10 +13,10 @@ from torch.utils.data import Dataset, DataLoader
 
 class ModelTester:
     """
-    A testing worker for neural network models.
+    A testing worker for neural network models used in challenge #1
 
-    Loads a neural network model, tests it on a given dataset, and computes different
-    performance metrics.
+    Loads a neural network model from a checkpoint file, tests it on a given dataset,
+    and computes different performance metrics (MSE and MAE losses).
     """
 
     def __init__(
@@ -62,10 +62,28 @@ class ModelTester:
 
     @property
     def training_losses(self) -> list[list[float]]:
+        """
+        MSE losses from network training (stored in the checkpoint file) at each epoch
+        (exterior index) and each batch (internal index).
+
+        Returns
+        -------
+        list[list[float]]
+            MSE losses during network training
+        """
         return self.__training_losses
 
     @property
     def validation_losses(self) -> list[list[float]]:
+        """
+        MSE losses from network validation (stored in the checkpoint file) at each epoch
+        (exterior index) and each batch (internal index).
+
+        Returns
+        -------
+        list[list[float]]
+            MSE losses during network validation
+        """
         return self.__validation_losses
 
     def run(self):
@@ -100,8 +118,8 @@ class ModelTester:
                 self.__testing_mae_losses.append(mae_loss.item())
 
             # Print mean performance for this round
-            print(f"ModelTester: Mean MSE loss {mean(self.__testing_mse_losses):.2f}")
-            print(f"ModelTester: Mean MAE loss {mean(self.__testing_mae_losses):.2f}")
+            print(f"ModelTester: Mean MSE loss {mean(self.__testing_mse_losses):.4f}")
+            print(f"ModelTester: Mean MAE loss {mean(self.__testing_mae_losses):.4f}")
 
             # Stack the prediction and save as numpy file
             if self.__save_predictions:
@@ -109,13 +127,26 @@ class ModelTester:
                 pass
 
     def __load_checkpoint(self, checkpoint_file_path: str) -> None:
+        """
+        Load a checkpoint file (model weights and losses) to test a network.
+
+        Parameters
+        ----------
+        checkpoint_file_path : str
+            Absolute path to the checkpoint file to load
+
+        Raises
+        ------
+        RuntimeError
+            Invalid or inexistant checkpoint file
+        """
         print(f"ModelTester: loading checkpoint {checkpoint_file_path}")
 
         # Make sure the target checkpoint file exists
         if not path.exists(checkpoint_file_path):
             raise RuntimeError(f"Checkpoint {checkpoint_file_path} does not exist.")
         if not path.isfile(checkpoint_file_path):
-            raise (f"{checkpoint_file_path} is not a file.")
+            raise RuntimeError(f"{checkpoint_file_path} is not a file.")
 
         checkpoint = torch.load(checkpoint_file_path, map_location=self.__device)
         self.__model.load_state_dict(checkpoint["model_state_dict"])

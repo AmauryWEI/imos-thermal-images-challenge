@@ -9,3 +9,4 @@ tqdm
 scipy
 black
 matplotlib
+pycocotools

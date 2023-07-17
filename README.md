@@ -1,22 +1,21 @@
 # imos-thermal-images-challenge
 
 This repository contains documentation and source code to tackle two deep-learning
-challenges.
+challenges on the [Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset).
 
 ## Challenges Descriptions
 
 ### Challenge 1
 
-Using this
-[Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset)
-to implement a deep-learning based method to predict the temperature in Celsius using
-the thermal images (and metadata if needed). Use the code provided in the repo for data
-loading, and feel free to use pytorch or tensorflow as you see fit.
+Using the
+[Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset),
+implement a deep-learning based method to predict the temperature in Celsius using
+the thermal images (and metadata if needed).
 
 ### Challenge 2
 
-Implement a pedestrian detection method based of the labelled data. Since YOLOv5 and
-Faster R-CNN are included in the repo, try to use a different method.
+Implement a pedestrian detection method based of the labelled data. Try methods
+different from YOLOv5 and Faster R-CNN.
 
 ## Getting Started
 
@@ -34,14 +33,17 @@ pyenv virtualenv 3.10.12 imos
 pip install -r requirements.txt
 ```
 
-### Quick Start Guide
+### Challenge #1
 
-1. Split the raw `Image_Dataset` into three separate training, validation, and testing
-sets:
+To get started on challenge #1, check the dedicated
+[`/thermal_prediction/README.md`](./thermal_prediction/README.md) file, which contains
+instructions to visualize the dataset, train models, and test them.
 
-    ```bash
-    python data_splitting/create_split_dataset.py ./dataset/LTD_Dataset/LTD_Dataset/Image_Dataset/metada_images.csv -o ./dataset/LTD_Dataset/LTD_Dataset/Split_Dataset/
-    ```
+### Challenge #2
+
+To get started on challenge #2, check the dedicated
+[`/pedestrian_detection/README.md`](./pedestrian_detection/README.md) file, which
+contains instructions to visualize the dataset, train models, and test them.
 
 ## Q&A
 
@@ -88,3 +90,25 @@ build and install it:
     python setup.py build
     python setup.py install
     ```
+
+### Facig a "Too many open files" exception
+
+The root cause behind this exception is not clear. With two separate machines
+running Ubuntu 20.04.6 LTS, one suffers from this issue and the other does not.
+This problem is discussed in 
+the [GitHub issue #11201](https://github.com/pytorch/pytorch/issues/11201) on 
+the `pytorch` repository.
+
+To mitigate the issue, you can add the following line at the beginning of the 
+`main()` function in the `train.py` scripts:
+
+```python
+torch.multiprocessing.set_sharing_strategy('file_system')
+```
+
+### Facing a "NaN loss during training" exception
+
+This issue might happen when training the Faster R-CNN MobileNetV3 networks with
+multiple trainable layers, a small batch size, and a large learning rate. Try to
+reduce the number of trainable layers (between 0 and 2), use a larger batch size
+(*e.g.* 4, 8, 16, ...), and reduce the learning rate (*e.g.* 4e-5).

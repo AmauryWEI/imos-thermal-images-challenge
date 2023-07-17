@@ -25,10 +25,16 @@ from resnet_models import (
     ResNet50_RgbMetadata,
     ResNet50_RgbMetadataMlp,
     ResNet18_RgbNoMetadata,
+    ResNet18_RgbMetadata,
+    ResNet18_RgbMetadataMlp,
 )
 from cnn_models import CnnModel
 from mlp_models import MlpModel, MlpModelDateTime
-from mobilenet_models import MobileNetV3Small_RgbNoMetadata
+from mobilenet_models import (
+    MobileNetV3Small_RgbNoMetadata,
+    MobileNetV3Small_RgbMetadata,
+    MobileNetV3Small_RgbMetadataMlp,
+)
 from model_trainer import parameters_count
 from model_tester import ModelTester
 
@@ -41,6 +47,8 @@ RGB_MODELS = [
     "ResNet18Metadata",
     "ResNet18MetadataMlp",
     "MobileNetV3Small",
+    "MobileNetV3SmallMetadata",
+    "MobileNetV3SmallMetadataMlp",
 ]
 
 # Define the arguments/options of the script
@@ -97,6 +105,16 @@ parser.add_argument("-s", "--save", help="Save predictions", type=bool, default=
 
 
 def plot_losses(model_tester: ModelTester, model_name: str) -> None:
+    """
+    Plots the training and validation MSE losses of a network ready for testing.
+
+    Parameters
+    ----------
+    model_tester : ModelTester
+        Contains the model, its training and validation losses history
+    model_name : str
+        Name of the model (for figure and plot titles)
+    """
     losses_fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(14, 8))
     losses_fig.canvas.manager.set_window_title(
         f"{model_name} - Training & Validation Losses"
@@ -106,19 +124,22 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
     mean_training_loss_per_epoch = np.mean(training_losses, axis=1)
     validation_losses = np.array(model_tester.validation_losses)
     mean_validation_loss_per_epoch = np.mean(validation_losses, axis=1)
-    max_loss = max(np.amax(training_losses), np.amax(validation_losses))
+    max_loss = max(
+        np.amax(mean_training_loss_per_epoch),
+        np.amax(mean_validation_loss_per_epoch),
+    )
 
     textbox_contents = "\n".join(
         (
-            f"Last Training MSE Loss    = {mean_training_loss_per_epoch[-1]:.2f}",
-            f"Last Validation MSE Loss = {mean_validation_loss_per_epoch[-1]:.2f}",
+            f"Last Training MSE Loss    = {mean_training_loss_per_epoch[-1]:.3f}",
+            f"Last Validation MSE Loss = {mean_validation_loss_per_epoch[-1]:.3f}",
         )
     )
     props = dict(boxstyle="round", facecolor="white", alpha=0.5)
     # Place a text box in bottom left in axes coords
     ax.text(
-        0.02,
-        0.1,
+        0.8,
+        0.9,
         textbox_contents,
         transform=ax.transAxes,
         fontsize=10,
@@ -138,10 +159,8 @@ def plot_losses(model_tester: ModelTester, model_name: str) -> None:
 
     # Format the plot
     ax.legend()
-    ax.set_ylim([0, max_loss + 1])
+    ax.set_ylim([0, 1.1 * max_loss])
     ax.set_xlim([0, len(mean_training_loss_per_epoch) - 1])
-    ax2.set_ylim([0, max_loss + 1])
-    ax3.set_ylim([0, max_loss + 1])
     ax2.set_xlim([0, len(training_losses.flatten()) - 1])
     ax3.set_xlim([0, len(validation_losses.flatten()) - 1])
     ax2.set_xticklabels([])
@@ -176,8 +195,16 @@ def model_from_name(model_name: str) -> Module:
         return ResNet50_RgbMetadataMlp()
     elif model_name == "ResNet18":
         return ResNet18_RgbNoMetadata()
+    elif model_name == "ResNet18Metadata":
+        return ResNet18_RgbMetadata()
+    elif model_name == "ResNet18MetadataMlp":
+        return ResNet18_RgbMetadataMlp()
     elif model_name == "MobileNetV3Small":
         return MobileNetV3Small_RgbNoMetadata()
+    elif model_name == "MobileNetV3SmallMetadata":
+        return MobileNetV3Small_RgbMetadata()
+    elif model_name == "MobileNetV3SmallMetadataMlp":
+        return MobileNetV3Small_RgbMetadataMlp()
     else:
         raise ValueError(f"Unknown model name: {model_name}")
 

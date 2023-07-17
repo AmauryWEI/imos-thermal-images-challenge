@@ -79,7 +79,7 @@ parser.add_argument(
     "--model",
     help="Model to use",
     type=str,
-    default="sample_model",
+    default="ResNet50",
 )
 
 parser.add_argument(
@@ -185,6 +185,9 @@ def train(
 
 
 def main(args: argparse.Namespace) -> int:
+    # Uncomment the following line if facing the "too many open files" exception
+    # torch.multiprocessing.set_sharing_strategy("file_system")
+
     device = torch.device("cpu")
     if torch.backends.mps.is_available():
         device = torch.device("mps")
