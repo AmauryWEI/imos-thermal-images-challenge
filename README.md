@@ -33,6 +33,22 @@ pyenv virtualenv 3.10.12 imos
 pip install -r requirements.txt
 ```
 
+Here are the exact versions used and tested for this project:
+
+| Package       | Version  |
+| ------------- | -------- |
+| numpy         | 1.25.1   |
+| pandas        | 2.0.3    |
+| decord        | 0.6.0    |
+| torch         | 2.0.1    |
+| torchvision   | 0.15.2   |
+| torchaudio    | 2.0.2    |
+| opencv-python | 4.8.0.74 |
+| tqdm          | 4.65.0   |
+| scipy         | 1.11.1   |
+| matplotlib    | 3.7.2    |
+| pycocotools   | 2.0.6    |
+
 ### Challenge #1
 
 To get started on challenge #1, check the dedicated
