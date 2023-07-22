@@ -233,6 +233,7 @@ def test(
     checkpoint: str,
     model_name: str,
     save_predictions: bool,
+    skip_plots: bool,
 ) -> None:
     model_tester = ModelTester(
         model=model,
@@ -243,9 +244,11 @@ def test(
         device=device,
         model_name=model_name,
     )
-    plot_losses(model_tester, model_name)
+    if not skip_plots:
+        plot_losses(model_tester, model_name)
     model_tester.run()
-    show_random_images_with_predictions(dataset, model_tester.predictions)
+    if not skip_plots:
+        show_random_images_with_predictions(dataset, model_tester.predictions)
 
 
 def main(args: argparse.Namespace) -> int:
@@ -302,6 +305,7 @@ def main(args: argparse.Namespace) -> int:
         checkpoint=args.checkpoint,
         model_name=args.model,
         save_predictions=args.save,
+        skip_plots=args.quiet,
     )
 
     return 0

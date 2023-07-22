@@ -6,10 +6,6 @@ This folder contains Pytorch models targeting Challenge #1. All the models are t
 input a rescaled image (with pixel values between 0 and 1), as well as normalized
 metadata (without the temperature obvisouly) as input.
 
-## Sample Model
-
-This is a sample model for testing purposes only.
-
 ## CNN Model
 
 1 single CNN model is proposed:

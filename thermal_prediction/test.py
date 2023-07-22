@@ -19,7 +19,6 @@ sys.path.append("./loaders/")
 from thermal_dataset import ThermalDataset
 
 sys.path.append("./models/")
-from sample_model import SampleModel
 from resnet_models import (
     ResNet50_RgbNoMetadata,
     ResNet50_RgbMetadata,
@@ -90,7 +89,7 @@ parser.add_argument(
     "--model",
     help="Model to use",
     type=str,
-    default="sample_model",
+    default="ResNet50",
 )
 
 parser.add_argument(
@@ -217,6 +216,7 @@ def test(
     checkpoint: str,
     model_name: str,
     save_predictions: bool,
+    skip_plots: bool,
 ) -> None:
     model_tester = ModelTester(
         model=model,
@@ -228,7 +228,8 @@ def test(
         device=device,
         model_name=model_name,
     )
-    plot_losses(model_tester, model_name)
+    if not skip_plots:
+        plot_losses(model_tester, model_name)
     model_tester.run()
 
 
@@ -280,7 +281,6 @@ def main(args: argparse.Namespace) -> int:
         images_abs_path=images_dir_abs_path,
         grayscale_to_rgb=requires_rgb(args.model),
         normalize=True,
-        augment=False,
     )
 
     # Load a model
@@ -299,6 +299,7 @@ def main(args: argparse.Namespace) -> int:
         checkpoint=args.checkpoint,
         model_name=args.model,
         save_predictions=args.save,
+        skip_plots=args.quiet,
     )
 
     return 0
