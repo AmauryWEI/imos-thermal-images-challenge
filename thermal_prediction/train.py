@@ -16,7 +16,6 @@ sys.path.append("./loaders/")
 from thermal_dataset import ThermalDataset
 
 sys.path.append("./models/")
-from sample_model import SampleModel
 from resnet_models import (
     ResNet50_RgbNoMetadata,
     ResNet50_RgbMetadata,
