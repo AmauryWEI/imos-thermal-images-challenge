@@ -1,0 +1,12 @@
+numpy
+pandas
+decord
+torch
+torchvision
+torchaudio
+opencv-python
+tqdm
+scipy
+black
+matplotlib
+pycocotools
