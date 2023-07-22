@@ -1,5 +1,9 @@
 # imos-thermal-images-challenge
 
+![Static Badge](https://img.shields.io/badge/version-v1.0.0-red)
+![Static Badge](https://img.shields.io/badge/Python-white?logo=python)
+![Static Badge](https://img.shields.io/badge/Pytorch-white?logo=pytorch)
+
 This repository contains documentation and source code to tackle two deep-learning
 challenges on the [Long-term Thermal Drift Dataset](https://www.kaggle.com/datasets/ivannikolov/longterm-thermal-drift-dataset).
 
