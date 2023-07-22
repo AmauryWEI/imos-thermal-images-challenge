@@ -19,7 +19,6 @@ sys.path.append("./loaders/")
 from thermal_dataset import ThermalDataset
 
 sys.path.append("./models/")
-from sample_model import SampleModel
 from resnet_models import (
     ResNet50_RgbNoMetadata,
     ResNet50_RgbMetadata,
@@ -90,7 +89,7 @@ parser.add_argument(
     "--model",
     help="Model to use",
     type=str,
-    default="sample_model",
+    default="ResNet50",
 )
 
 parser.add_argument(
