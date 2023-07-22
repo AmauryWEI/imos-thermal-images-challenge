@@ -282,7 +282,6 @@ def main(args: argparse.Namespace) -> int:
         images_abs_path=images_dir_abs_path,
         grayscale_to_rgb=requires_rgb(args.model),
         normalize=True,
-        augment=False,
     )
 
     # Load a model

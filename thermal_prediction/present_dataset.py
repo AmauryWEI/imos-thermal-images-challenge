@@ -161,7 +161,6 @@ def main(args: argparse.Namespace) -> int:
         images_abs_path=images_dir_abs_path,
         grayscale_to_rgb=True,
         normalize=False,
-        augment=False,
     )
 
     show_metadata_distribution(dataset)

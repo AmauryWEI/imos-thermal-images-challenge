@@ -49,7 +49,6 @@ class ThermalDataset(Dataset):
         images_abs_path: str,
         grayscale_to_rgb: bool = False,
         normalize: bool = True,
-        augment: bool = False,
         quiet: bool = False,
     ) -> None:
         """
@@ -65,8 +64,6 @@ class ThermalDataset(Dataset):
             Converted the raw images to RGB, by default False
         normalize: bool, optional
             Normalize the metadata, by default True
-        augment: bool, optional
-            Augment the dataset, by default False
         quiet: bool, optional
             No log output, by default False
         """
@@ -92,11 +89,6 @@ class ThermalDataset(Dataset):
 
         # Convert the string date to day of the year + hour
         self.__create_day_and_hour_columns()
-
-        # Augment the dataset if required
-        if augment:
-            # TODO: Implement Dataset augmentation
-            pass
 
         # Compute normalization parameters
         if self.__normalize:
